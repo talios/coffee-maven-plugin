@@ -5,7 +5,7 @@
     <artifactId>coffee-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <version>1.1.0-SNAPSHOT</version>
-    <name>Maven Mojo Archetype</name>
+    <name>Coffeescript Maven Plugin</name>
     <url>http://maven.apache.org</url>
 
     <scm>
