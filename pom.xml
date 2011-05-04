@@ -1,25 +1,74 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.theoryinpractise.coffeescript</groupId>
+    <groupId>com.theoryinpractise</groupId>
     <artifactId>coffee-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>Maven Mojo Archetype</name>
     <url>http://maven.apache.org</url>
 
+    <scm>
+        <developerConnection>scm:git:git@github.com:talios/coffee-maven-plugin.git</developerConnection>
+        <url>http://github.com/talios/coffee-maven-plugin</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>talios</id>
+            <name>Mark Derricutt</name>
+            <email>mark@talios.com</email>
+            <url>http://twitter.com/talios</url>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License</name>
+        </license>
+    </licenses>
+
     <distributionManagement>
-         <repository>
-             <uniqueVersion>true</uniqueVersion>
-             <id>smx-releases</id>
-             <url>http://build.smx.co.nz:8081/nexus/content/repositories/releases</url>
-         </repository>
-         <snapshotRepository>
-             <uniqueVersion>true</uniqueVersion>
-             <id>smx-snapshots</id>
-             <url>http://build.smx.co.nz:8081/nexus/content/repositories/snapshots</url>
-         </snapshotRepository>
-     </distributionManagement>
+        <repository>
+            <id>sonatype-staging</id>
+            <name>oss.sonatype.org Staging Repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>github-snapshots</id>
+            <name>oss.sonatype.org github Release Repository Snapshot Repository</name>
+            <url>http://oss.sonatype.org/content/repositories/github-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>
@@ -82,5 +131,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>
