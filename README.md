@@ -4,7 +4,7 @@ Coffeescript Maven Plugin
       <plugins>
         <plugin>
           <groupId>com.theoryinpractise</groupId>
-          <artifactId>coffeescript-maven-plugin</artifactId>
+          <artifactId>coffee-maven-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
           <configuration>
             <coffeeDir>src/main/coffee</coffeeDir>
