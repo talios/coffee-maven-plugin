@@ -9,7 +9,7 @@ Coffeescript Maven Plugin
           <configuration>
             <coffeeDir>src/main/coffee</coffeeDir>
             <outputDirectory>${project.build.directory}/coffee</outputDirectory>
-            <bare>true</bare>
+            <bare>false</bare>
           </configuration>
           <executions>
             <execution>
