@@ -71,12 +71,6 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             throw new MojoExecutionException("Coffee source directory not found: " + coffeeDir.getPath());
         }
 
-        File f = outputDirectory;
-
-        if (!f.exists()) {
-            f.mkdirs();
-        }
-
         try {
             compileCoffeeFilesInDirector(coffeeScriptCompiler, coffeeDir);
         } catch (Exception e) {
@@ -114,6 +108,10 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         String js = coffeeScriptCompiler.compile(CharStreams.toString(rs));
 
         File jsFile = new File(outputDirectory, jsFileName);
+
+        if (!jsFile.getParentFile().exists()) {
+            jsFile.getParentFile().mkdirs();
+        }
 
         Files.write(js, jsFile, Charsets.UTF_8);
 
