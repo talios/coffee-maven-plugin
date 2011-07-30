@@ -7,7 +7,7 @@ Configuration options shown are default values and can be ignored for normal use
         <plugin>
           <groupId>com.theoryinpractise</groupId>
           <artifactId>coffee-maven-plugin</artifactId>
-          <version>1.1.0</version>
+          <version>1.1.2</version>
           <configuration>
             <coffeeDir>src/main/coffee</coffeeDir>
             <outputDirectory>${project.build.directory}/coffee</outputDirectory>
