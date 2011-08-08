@@ -145,7 +145,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         };
 
         // Map joinsets
-	if (joinSets != null) {
+        if (joinSets != null) {
           for (JoinSet joinSet : joinSets) {
 
             String description = String.format(
