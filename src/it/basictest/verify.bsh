@@ -1,0 +1,14 @@
+import java.io.*;
+
+file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest1.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Could not find generated javascript file: " + file );
+}
+file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest2.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Could not find generated javascript file: " + file );
+}
+file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest3.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Could not find generated javascript file: " + file );
+}
