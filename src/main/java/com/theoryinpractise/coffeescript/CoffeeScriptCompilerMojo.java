@@ -24,10 +24,8 @@ import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
-import com.sun.istack.internal.Nullable;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.jcoffeescript.JCoffeeScriptCompileException;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,10 +75,6 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
-//        JCoffeeScriptCompiler coffeeScriptCompiler = bare
-//                ? new JCoffeeScriptCompiler(Sets.immutableEnumSet(Option.BARE))
-//                : new JCoffeeScriptCompiler();
-
         CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(bare);
 
         if (!coffeeDir.exists()) {
@@ -126,20 +120,20 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     }
 
     private void compileCoffeeFilesInDirector(final CoffeeScriptCompiler coffeeScriptCompiler, final File coffeeDir)
-            throws IOException, JCoffeeScriptCompileException, MojoExecutionException {
+            throws IOException, MojoExecutionException {
 
         List<File> coffeeFiles = findCoffeeFilesInDirectory(coffeeDir);
 
         Map<File, JoinSetSource> coffeeSuppliers = Maps.newHashMap();
 
         Function<String,File> prependCoffeeDirToFiles = new Function<String, File>() {
-            public File apply(@Nullable String file) {
+            public File apply(String file) {
                 return file == null ? null : new File(coffeeDir, file);
             }
         };
 
         Function<String,String> simpleFileName = new Function<String, String>() {
-            public String apply(@Nullable String file) {
+            public String apply(String file) {
                 return file == null ? null : file.substring(file.lastIndexOf("/") + 1);
             }
         };
@@ -185,7 +179,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     }
 
-    private void compileCoffeeFile(CoffeeScriptCompiler coffeeScriptCompiler, File jsFile, InputSupplier<? extends Reader> coffeeSupplier) throws IOException, JCoffeeScriptCompileException {
+    private void compileCoffeeFile(CoffeeScriptCompiler coffeeScriptCompiler, File jsFile, InputSupplier<? extends Reader> coffeeSupplier) throws IOException {
 
         if (!jsFile.getParentFile().exists()) {
             jsFile.getParentFile().mkdirs();

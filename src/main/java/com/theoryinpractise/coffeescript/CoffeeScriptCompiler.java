@@ -3,7 +3,6 @@ package com.theoryinpractise.coffeescript;
 import com.google.common.base.Charsets;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
-import org.jcoffeescript.JCoffeeScriptCompileException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -33,7 +32,7 @@ public class CoffeeScriptCompiler {
 
     }
 
-    public String compile(String coffeeScriptSource) throws JCoffeeScriptCompileException {
+    public String compile(String coffeeScriptSource) {
         Context context = Context.enter();
         try {
             Scriptable compileScope = context.newObject(globalScope);
