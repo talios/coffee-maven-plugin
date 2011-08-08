@@ -21,7 +21,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
@@ -29,8 +28,6 @@ import com.sun.istack.internal.Nullable;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.jcoffeescript.JCoffeeScriptCompileException;
-import org.jcoffeescript.JCoffeeScriptCompiler;
-import org.jcoffeescript.Option;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,10 +77,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
-        JCoffeeScriptCompiler coffeeScriptCompiler = bare
-                ? new JCoffeeScriptCompiler(Sets.immutableEnumSet(Option.BARE))
-                : new JCoffeeScriptCompiler();
+//        JCoffeeScriptCompiler coffeeScriptCompiler = bare
+//                ? new JCoffeeScriptCompiler(Sets.immutableEnumSet(Option.BARE))
+//                : new JCoffeeScriptCompiler();
 
+        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(bare);
 
         if (!coffeeDir.exists()) {
             throw new MojoExecutionException("Coffee source directory not found: " + coffeeDir.getPath());
@@ -127,7 +125,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
     }
 
-    private void compileCoffeeFilesInDirector(final JCoffeeScriptCompiler coffeeScriptCompiler, final File coffeeDir)
+    private void compileCoffeeFilesInDirector(final CoffeeScriptCompiler coffeeScriptCompiler, final File coffeeDir)
             throws IOException, JCoffeeScriptCompileException, MojoExecutionException {
 
         List<File> coffeeFiles = findCoffeeFilesInDirectory(coffeeDir);
@@ -147,7 +145,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         };
 
         // Map joinsets
-        for (JoinSet joinSet : joinSets) {
+        if (joinSets != null) {
+          for (JoinSet joinSet : joinSets) {
 
             String description = String.format(
                     "joingset %s (containing %s)",
@@ -169,6 +168,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             File jsFileName = new File(outputDirectory, joinSet.getId() + ".js");
             coffeeSuppliers.put(jsFileName, new JoinSetSource(description, joinSetSupplier));
 
+          }
         }
 
         // Map remaining files
@@ -185,7 +185,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     }
 
-    private void compileCoffeeFile(JCoffeeScriptCompiler coffeeScriptCompiler, File jsFile, InputSupplier<? extends Reader> coffeeSupplier) throws IOException, JCoffeeScriptCompileException {
+    private void compileCoffeeFile(CoffeeScriptCompiler coffeeScriptCompiler, File jsFile, InputSupplier<? extends Reader> coffeeSupplier) throws IOException, JCoffeeScriptCompileException {
 
         if (!jsFile.getParentFile().exists()) {
             jsFile.getParentFile().mkdirs();
