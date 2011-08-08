@@ -145,7 +145,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         };
 
         // Map joinsets
-        for (JoinSet joinSet : joinSets) {
+	if (joinSets != null) {
+          for (JoinSet joinSet : joinSets) {
 
             String description = String.format(
                     "joingset %s (containing %s)",
@@ -167,6 +168,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             File jsFileName = new File(outputDirectory, joinSet.getId() + ".js");
             coffeeSuppliers.put(jsFileName, new JoinSetSource(description, joinSetSupplier));
 
+          }
         }
 
         // Map remaining files
