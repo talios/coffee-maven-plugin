@@ -1,18 +1,81 @@
 Coffeescript Maven Plugin
 
-Configuration options shown are default values and can be ignored for normal use.
+Changes from 1.1.x versions:  
+CoffeeScript files are joined together by default by JoinSets.
+JoinSets now contain Maven FileSets instead of listing
+Requires Java5 or above
 
+
+USAGE:
+
+Add the main plugin elements:  groupId, artifactId, and version
+<plugin>
+  <groupId>com.theoryinpractise</groupId>
+  <artifactId>coffee-maven-plugin</artifactId>
+  <version>1.2.1</version>
+</plugin>
+
+Add the execution goal
+<executions>
+  <execution>
+    <id>coffee</id>
+    <goals>
+      <goal>coffee</goal>
+    </goals>
+  </execution>
+</executions>
+
+Configure the destination of the resultant js file
+<outputDirectory>${project.build.directory}/coffee</outputDirectory>
+
+Specify bare (see coffeescript compiler documentation)
+<bare>false</bare>
+
+Finally, add JoinSets.  The id of the joinSet will be the name of the resultant javascript file.
+<joinSets>
+  <joinSet>
+    <id>main</id>
+  </joinSet>
+</joinSets>
+
+
+
+An Example Build Section:
     <build>
       <plugins>
         <plugin>
           <groupId>com.theoryinpractise</groupId>
           <artifactId>coffee-maven-plugin</artifactId>
-          <version>1.1.3</version>
+          <version>1.2.1</version>
+          
           <configuration>
-            <coffeeDir>src/main/coffee</coffeeDir>
             <outputDirectory>${project.build.directory}/coffee</outputDirectory>
             <bare>false</bare>
+            <joinSets>
+              <joinSet>
+                <id>main</id>
+                <fileSet>
+                  <directory>${basedir}/src/main/coffee</directory>
+                  <includes>
+                    <include>**/*.coffee</include>
+                  </includes>
+                  <excludes>
+                    <exclude>**/jointest3.*</exclude>
+                  </excludes>
+                </fileSet>
+              </joinSet>
+              <joinSet>
+                <id>alternate</id>
+                <fileSet>
+                  <directory>${basedir}/src/main/coffee</directory>
+                  <includes>
+                    <include>**/jointest3.*</include>
+                  </includes>
+                </fileSet>
+              </joinSet>
+            </joinSets>
           </configuration>
+          
           <executions>
             <execution>
               <id>coffee</id>
@@ -21,24 +84,7 @@ Configuration options shown are default values and can be ignored for normal use
               </goals>
             </execution>
           </executions>
+          
         </plugin>
       </plugins>
     </build>
-
-Coffee files can be joined into a single .js file but configuring <joinSet/> elements:
-
-    <configuration>
-      <joinSets>
-        <joinSet>
-          <id>main</id>
-          <files>
-            <file>file1.coffee</file>
-            <file>file2.coffee</file>
-          </files>
-        </joinSet>
-      </joinSets>
-    </configuration>
-
-The above configuration will join file1.coffee, and file2.coffee found in the <coffeeDir/>
-and compile them into the file main.js.  Any other .coffee files found will compile into
-their respective .js file as normal.
