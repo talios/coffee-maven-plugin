@@ -9,6 +9,7 @@ Requires Java5 or above
 USAGE:
 
 Add the main plugin elements:  groupId, artifactId, and version
+
 <plugin>
   <groupId>com.theoryinpractise</groupId>
   <artifactId>coffee-maven-plugin</artifactId>
@@ -16,6 +17,7 @@ Add the main plugin elements:  groupId, artifactId, and version
 </plugin>
 
 Add the execution goal
+
 <executions>
   <execution>
     <id>coffee</id>
@@ -26,12 +28,15 @@ Add the execution goal
 </executions>
 
 Configure the destination of the resultant js file
+
 <outputDirectory>${project.build.directory}/coffee</outputDirectory>
 
 Specify bare (see coffeescript compiler documentation)
+
 <bare>false</bare>
 
 Finally, add JoinSets.  The id of the joinSet will be the name of the resultant javascript file.
+
 <joinSets>
   <joinSet>
     <id>main</id>
@@ -41,6 +46,7 @@ Finally, add JoinSets.  The id of the joinSet will be the name of the resultant 
 
 
 An Example Build Section:
+
     <build>
       <plugins>
         <plugin>
