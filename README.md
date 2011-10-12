@@ -10,38 +10,38 @@ USAGE:
 
 Add the main plugin elements:  groupId, artifactId, and version
 
-<plugin>
-  <groupId>com.theoryinpractise</groupId>
-  <artifactId>coffee-maven-plugin</artifactId>
-  <version>1.2.1</version>
-</plugin>
+    <plugin>
+      <groupId>com.theoryinpractise</groupId>
+      <artifactId>coffee-maven-plugin</artifactId>
+      <version>1.2.1</version>
+    </plugin>
 
 Add the execution goal
 
-<executions>
-  <execution>
-    <id>coffee</id>
-    <goals>
-      <goal>coffee</goal>
-    </goals>
-  </execution>
-</executions>
+    <executions>
+      <execution>
+        <id>coffee</id>
+        <goals>
+          <goal>coffee</goal>
+        </goals>
+      </execution>
+    </executions>
 
 Configure the destination of the resultant js file
 
-<outputDirectory>${project.build.directory}/coffee</outputDirectory>
+    <outputDirectory>${project.build.directory}/coffee</outputDirectory>
 
 Specify bare (see coffeescript compiler documentation)
 
-<bare>false</bare>
+    <bare>false</bare>
 
 Finally, add JoinSets.  The id of the joinSet will be the name of the resultant javascript file.
 
-<joinSets>
-  <joinSet>
-    <id>main</id>
-  </joinSet>
-</joinSets>
+    <joinSets>
+      <joinSet>
+        <id>main</id>
+      </joinSet>
+    </joinSets>
 
 
 
