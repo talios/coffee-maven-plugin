@@ -5,7 +5,7 @@ if ( !file.isFile() ) {
   throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file );
 }
 
-file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest1.js" );
+file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/foo.js" );
 if ( file.isFile() ) {
   throw new FileNotFoundException( "Found generated javascript file: " + file );
 }
