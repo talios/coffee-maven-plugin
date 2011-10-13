@@ -45,7 +45,7 @@ Finally, add JoinSets.  The id of the joinSet will be the name of the resultant 
     </joinSets>
 
 Optionally, specify a minified file location.  It defaults to:  
-  <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
+    <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
 
 An Example Build Section:
 
@@ -54,7 +54,7 @@ An Example Build Section:
         <plugin>
           <groupId>com.theoryinpractise</groupId>
           <artifactId>coffee-maven-plugin</artifactId>
-          <version>1.2.1</version>
+          <version>1.3.1</version>
           
           <configuration>
             <outputDirectory>${project.build.directory}/coffee</outputDirectory>
