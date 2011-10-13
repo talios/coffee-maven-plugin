@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.theoryinpractise</groupId>
-    <artifactId>jointest</artifactId>
-    <version>testing</version>
+    <artifactId>filesettest</artifactId>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>jointest</name>
+    <name>filesettest</name>
     <url>http://maven.apache.org</url>
 
     <properties>
