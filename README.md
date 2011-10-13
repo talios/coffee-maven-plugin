@@ -4,6 +4,7 @@ Changes from 1.1.x versions:
 CoffeeScript files are joined together by default by JoinSets.
 JoinSets now contain Maven FileSets instead of listing
 Requires Java5 or above
+Creates a minified version using the Closure Compiler
 
 
 USAGE:
@@ -43,7 +44,8 @@ Finally, add JoinSets.  The id of the joinSet will be the name of the resultant 
       </joinSet>
     </joinSets>
 
-
+Optionally, specify a minified file location.  It defaults to:  
+  <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
 
 An Example Build Section:
 
@@ -57,6 +59,7 @@ An Example Build Section:
           <configuration>
             <outputDirectory>${project.build.directory}/coffee</outputDirectory>
             <bare>false</bare>
+            <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
             <joinSets>
               <joinSet>
                 <id>main</id>

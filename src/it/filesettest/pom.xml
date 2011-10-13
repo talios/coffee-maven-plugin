@@ -31,6 +31,7 @@
                 </executions>
 
                 <configuration>
+                	<minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
                     <joinSets>
                         <joinSet>
                             <id>main</id>

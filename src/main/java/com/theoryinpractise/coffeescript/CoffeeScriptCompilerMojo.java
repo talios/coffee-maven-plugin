@@ -66,7 +66,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private List<JoinSet> joinSets;
     
     /**
-	 * @parameter expression= "${project.build.directory}/coffee/${project.artifactId}-${project.version}.js"
+	 * @parameter expression= "${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js"
 	 * @required
 	 */
     private String minifiedFile;
