@@ -47,7 +47,7 @@ public class CoffeeScriptCompiler {
             globalScope = context.initStandardObjects();
             context.evaluateReader(globalScope, supplier.getInput(), "coffee-script.js", 0, null);
         } catch (IOException e1) {
-            throw new CoffeeScriptException(e1.getMessage());
+            throw new CoffeeScriptException(e1.getMessage(), e1);
         } finally {
             Context.exit();
         }
@@ -69,7 +69,7 @@ public class CoffeeScriptCompiler {
                         String.format("CoffeeScript.compile(coffeeScript, %s);", options),
                         "source", 0, null);
             } catch (JavaScriptException e) {
-                throw new CoffeeScriptException(e.getMessage());
+                throw new CoffeeScriptException(e.getMessage(), e);
             }
         } finally {
             Context.exit();

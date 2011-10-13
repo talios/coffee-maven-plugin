@@ -26,4 +26,8 @@ public class CoffeeScriptException extends RuntimeException {
 	public CoffeeScriptException(String message) {
         super(message);
     }
+	
+	public CoffeeScriptException(String message, Throwable t) {
+        super(message, t);
+    }
 }
