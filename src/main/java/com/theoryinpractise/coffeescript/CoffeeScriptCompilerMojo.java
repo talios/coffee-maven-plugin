@@ -64,6 +64,12 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      * @required
      */
     private List<JoinSet> joinSets;
+    
+    /**
+	 * @parameter expression= "${project.build.directory}/coffee/${project.artifactId}-${project.version}.js"
+	 * @required
+	 */
+    private String minifiedFile;
 
     public void execute() throws MojoExecutionException {
 
@@ -71,9 +77,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         
         try {
         	compileCoffeeFiles(gatherCoffeeFiles(), coffeeScriptCompiler);
+        	
+        	minifyJavascriptFiles();
             
         } catch (Exception e) {
-            throw new MojoExecutionException(e.getMessage());
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 
@@ -125,6 +133,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             
             Files.write(js, jsFile, Charsets.UTF_8);
         }
+    }
+    
+    private void minifyJavascriptFiles(){
+    	ClosureMinifier minifier = new ClosureMinifier();
+    	minifier.compile(outputDirectory.getAbsolutePath(), minifiedFile);
     }
     
     private class JoinSetSource {
