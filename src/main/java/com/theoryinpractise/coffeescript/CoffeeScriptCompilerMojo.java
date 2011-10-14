@@ -86,7 +86,6 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     }
 
     private Map<File, JoinSetSource> gatherCoffeeFiles() throws IOException, MojoExecutionException {
-        List<File> coffeeFiles = Lists.newArrayList();
         Map<File, JoinSetSource> coffeeSuppliers = Maps.newHashMap();
 
         if (joinSets != null) {
@@ -94,27 +93,28 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
             String description = joinSet.getId();
             
-            List<InputSupplier<InputStreamReader>> joinSetSuppliers = Lists.newArrayList();
+            getLog().info("JoinSet" + joinSet.getId());
+            
+            StringBuilder joinSetFileContents = new StringBuilder();
+            
             for (File file : joinSet.getFiles()) {
                 if (!file.exists()) {
                     throw new MojoExecutionException(String.format("JoinSet %s references missing file: %s", joinSet.getId(), file.getPath()));
                 }
 
                 InputSupplier<InputStreamReader> readerSupplier = Files.newReaderSupplier(file, Charsets.UTF_8);
-                joinSetSuppliers.add(readerSupplier);
-                coffeeFiles.remove(file);
+                joinSetFileContents.append(CharStreams.toString(readerSupplier));
+                joinSetFileContents.append("\n");
             }
-
-            InputSupplier<Reader> joinSetSupplier = CharStreams.join(joinSetSuppliers);
+            
             File jsFileName = new File(outputDirectory, joinSet.getId() + ".js");
-            coffeeSuppliers.put(jsFileName, new JoinSetSource(description, joinSetSupplier));
-
+            coffeeSuppliers.put(jsFileName, new JoinSetSource(description, joinSetFileContents.toString()));
           }
         }
 
         return coffeeSuppliers;
     }
-   
+    
     private void compileCoffeeFiles(final Map<File, JoinSetSource> coffeeSuppliers, 
     		final CoffeeScriptCompiler coffeeScriptCompiler) throws IOException {
 
@@ -122,8 +122,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             getLog().info(String.format("Compiling %s", entry.getValue().description));
             
             //Get the coffee file contents and compile it into some javascript.
-            InputSupplier<? extends Reader> coffeeSupplier = entry.getValue().inputSupplier;
-            String js = coffeeScriptCompiler.compile(CharStreams.toString(coffeeSupplier));
+            String coffeeSupplier = entry.getValue().source;
+            String js = coffeeScriptCompiler.compile(coffeeSupplier);
 
             //Create the new Javascript file path
             File jsFile = entry.getKey();
@@ -142,11 +142,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     
     private class JoinSetSource {
         final String description;
-        final InputSupplier<? extends Reader> inputSupplier;
+        final String source;
 
-        private JoinSetSource(String description, InputSupplier<? extends Reader> inputSupplier) {
+        private JoinSetSource(String description, String source) {
             this.description = description;
-            this.inputSupplier = inputSupplier;
+            this.source = source;
         }
     }
 }
