@@ -3,3 +3,4 @@ class Foo
     console.log "I've been constructed!"
   bar: (param3) ->
     console.log param3
+    
