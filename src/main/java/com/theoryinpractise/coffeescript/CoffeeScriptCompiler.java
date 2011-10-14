@@ -45,9 +45,9 @@ public class CoffeeScriptCompiler {
         context.setOptimizationLevel(-1); // Without this, Rhino hits a 64K bytecode limit and fails
         try {
             globalScope = context.initStandardObjects();
-            context.evaluateReader(globalScope, supplier.getInput(), "coffee-script.js", 0, null);
+            context.evaluateReader(globalScope, supplier.getInput(), coffeeScriptCompilerScript, 0, null);
         } catch (IOException e1) {
-            throw new CoffeeScriptException(e1.getMessage(), e1);
+            throw new CoffeeScriptException("Unable to load the coffeeScript compiler into Rhino", e1);
         } finally {
             Context.exit();
         }
