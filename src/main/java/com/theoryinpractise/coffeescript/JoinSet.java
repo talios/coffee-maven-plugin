@@ -18,12 +18,16 @@ package com.theoryinpractise.coffeescript;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.FileUtils;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 
 /**
  * Wrap a Maven fileset to add properties for describing the group of files
@@ -35,6 +39,16 @@ public class JoinSet {
 
     private FileSet fileSet;
 
+    /**
+     * A cache of the list of files in the fileSet
+     */
+    private List<File> files;
+    
+    /**
+     * A cache of the concatenated contents of the files in the fileset
+     */
+    private String concatenatedStringOfFiles;
+    
     public String getId() {
         return id;
     }
@@ -50,34 +64,44 @@ public class JoinSet {
      * Pulls the list of files that will be used from the fileset.
      * @throws MojoExecutionException
      */
-    public List<File> getFiles() throws MojoExecutionException {
-    	try {
-                File directory = new File(getFileSet().getDirectory());
-                String includes = getCommaSeparatedList(this.getFileSet().getIncludes());
-                String excludes = getCommaSeparatedList(this.getFileSet().getExcludes());
-                return FileUtils.getFiles(directory, includes, excludes);
-                
-        } catch (IOException e) {
-                throw new MojoExecutionException("Unable to get paths to source files", e);
-        }
+    public List<File> getFiles() throws IOException {
+    	if(null==files){
+	    	files = FileUtilities.getFilesFromFileSet(getFileSet());
+	    }
+    	return files;
     }
     
-    /**
-     * Helper utility to turn a list of File into a concatenated string of filenames
-     */
-    protected String getCommaSeparatedList(List<String> list) {
-        StringBuffer sb = new StringBuffer();
-        
-        for (Iterator<String> i = list.iterator(); i.hasNext(); ){
-        	sb.append(i.next());
-            if (i.hasNext()) {
-            	sb.append(",");
-            }
-        }
-                
-        return sb.toString();
+    public String getFileNames() throws IOException {
+    	StringBuilder joinSetFileNames = new StringBuilder();
+    	
+		for(File file : getFiles()){
+		    joinSetFileNames.append(file.getName());
+		    joinSetFileNames.append(", ");
+		}
+		
+    	return joinSetFileNames.toString();
     }
+    
+    public String getConcatenatedStringOfFiles() throws IOException{
+    	if(null==concatenatedStringOfFiles){
+    		StringBuilder sb = new StringBuilder();
+        	
+        	for (File file : getFiles()) {
+                if (!file.exists()) {
+                    throw new IOException(String.format("JoinSet %s references missing file: %s", getId(), file.getPath()));
+                }
 
+                InputSupplier<InputStreamReader> readerSupplier = Files.newReaderSupplier(file, Charsets.UTF_8);
+                sb.append(CharStreams.toString(readerSupplier));
+                sb.append("\n");
+            }
+        	
+        	concatenatedStringOfFiles = sb.toString();
+    	}
+    	
+    	return concatenatedStringOfFiles;
+    }
+    
 	public FileSet getFileSet() {
 		return fileSet;
 	}
@@ -86,6 +110,9 @@ public class JoinSet {
 	 * a maven FileSet to define what files are included, excluded, etc
 	 */
 	public void setFileSet(FileSet fileSet) {
+		files = null;
+		concatenatedStringOfFiles = null;
 		this.fileSet = fileSet;
+		
 	}
 }
