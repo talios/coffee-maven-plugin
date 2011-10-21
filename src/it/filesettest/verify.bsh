@@ -5,15 +5,24 @@ if ( !file.isFile() ) {
   throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file );
 }
 
-file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest1.js" );
+file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/foo.js" );
 if ( file.isFile() ) {
   throw new FileNotFoundException( "Found generated javascript file: " + file );
 }
-file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest2.js" );
+
+file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/cookbook.js" );
 if ( file.isFile() ) {
   throw new FileNotFoundException( "Found generated javascript file: " + file );
 }
+
 file = new File( basedir, "target/coffee/com/theoryinpractise/jointest/jointest3.js" );
+if ( file.isFile() ) {
+  throw new FileNotFoundException( "Found generated javascript file: " + file );
+}
+
+
+
+file = new File( basedir, "target/coffee/alternate.js" );
 if ( !file.isFile() ) {
-  throw new FileNotFoundException( "Could not find generated javascript file: " + file );
+  throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file);
 }
