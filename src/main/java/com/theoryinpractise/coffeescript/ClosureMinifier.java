@@ -17,11 +17,10 @@ package com.theoryinpractise.coffeescript;
  */
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.maven.plugin.logging.Log;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -42,41 +41,30 @@ import com.google.javascript.jscomp.Result;
  */
 public class ClosureMinifier {
 
-	public ClosureMinifier(){}
-	
-	public ClosureMinifier(String compilationLevel){
-		this.compilationLevel = compilationLevel;
+	public ClosureMinifier(Log logger){
+		this.logger = logger;
 	}
 	
+	public ClosureMinifier(String compilationLevel, Log logger){
+		this.compilationLevel = compilationLevel;
+		this.logger = logger;
+	}
+	
+	private Log logger;
 	private String compilationLevel = CompilationLevel.SIMPLE_OPTIMIZATIONS.toString();
 	
-	public void compile(String sourceDirectory, String destFileName){
-		File destFile = new File(destFileName);
-		if(destFile.exists()){
-			destFile.delete();
-		}
+	public void compile(List<File> filesToCompile, String destFileName){
+		File destFile = prepareDestFile(destFileName);
 		
-		CompilationLevel level = null;
-		try {
-			level = CompilationLevel.valueOf(this.compilationLevel);
-		} catch (IllegalArgumentException e) {
-			throw new ClosureException("Compilation level is invalid", e);
-		}
-
-		CompilerOptions options = new CompilerOptions();
-		level.setOptionsForCompilationLevel(options);
-
 		Compiler compiler = new Compiler();
-		Result results = compiler.compile(getExterns(), getInputs(sourceDirectory), options);
+		Result results = compiler.compile(getExterns(), getInputs(filesToCompile), getCompilerOptions());
 		
-		System.out.println(results.debugLog);
-		
+		logger.debug(results.debugLog);		
 		for(JSError error : results.errors){
-			System.out.println("Closure Minifier Error:  " + error.sourceName + "  Description:  " +  error.description);
+			logger.error("Closure Minifier Error:  " + error.sourceName + "  Description:  " +  error.description);
 		}
-		
 		for(JSError warning : results.warnings){
-			System.out.println("Closure Minifier Warning:  " + warning.sourceName + "  Description:  " +  warning.description);
+			logger.info("Closure Minifier Warning:  " + warning.sourceName + "  Description:  " +  warning.description);
 		}
 		
 		if (results.success) {
@@ -88,6 +76,35 @@ public class ClosureMinifier {
 		}else{
 			throw new ClosureException("Closure Compiler Failed - See error messages on System.err");
 		}
+	}
+	
+	/**
+	 * Prepare the Destination File, Remove if it already exists
+	 * @param destFileName
+	 */
+	private File prepareDestFile(String destFileName){
+		File destFile = new File(destFileName);
+		if(destFile.exists()){
+			destFile.delete();
+		}
+		return destFile;
+	}
+	
+	/**
+	 * Prepare options for the Compiler.
+	 */
+	private CompilerOptions getCompilerOptions(){
+		CompilationLevel level = null;
+		try {
+			level = CompilationLevel.valueOf(this.compilationLevel);
+		} catch (IllegalArgumentException e) {
+			throw new ClosureException("Compilation level is invalid", e);
+		}
+
+		CompilerOptions options = new CompilerOptions();
+		level.setOptionsForCompilationLevel(options);
+
+		return options;
 	}
 	
 	/**
@@ -110,19 +127,12 @@ public class ClosureMinifier {
 		}
 		return externs.toArray(new JSSourceFile[externs.size()]);
 	}
-
-
-	private JSSourceFile[] getInputs(String sourceDirectory){
+	
+	private JSSourceFile[] getInputs(List<File> filesToProcess){
 		List<JSSourceFile> files = Lists.newArrayList();
 		
-		File srcDir = new File(sourceDirectory);
-		
-		if(srcDir.exists() && srcDir.isDirectory()){
-			File[] filesInSrcDir = srcDir.listFiles((FileFilter) new SuffixFileFilter(".js"));
-			for(File file : filesInSrcDir){
-				System.out.println("Adding File:  " + file.getName());
-				files.add(JSSourceFile.fromFile(file));
-			}
+		for(File file : filesToProcess){
+			files.add(JSSourceFile.fromFile(file));
 		}
 		
 		return files.toArray(new JSSourceFile[files.size()]);

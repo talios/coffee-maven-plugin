@@ -18,20 +18,16 @@ package com.theoryinpractise.coffeescript;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 
 /**
  * Compile CoffeeScript with Maven
@@ -42,19 +38,27 @@ import com.google.common.io.InputSupplier;
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     /**
-     * Location of the output file.  Defaults to ${build.directory}/coffee
+     * Location of the output files from the Coffee Compiler.  Defaults to ${build.directory}/coffee
      *
      * @parameter expression="${project.build.directory}/coffee"
      * @required
      */
-    private File outputDirectory;
+    private File coffeeOutputDirectory;
 
     /**
-     * Should we compile as bare?
+     * Should we compile as bare?  A compiler option for the Coffee Compiler.
      *
      * @parameter default-value="false"
      */
     private Boolean bare;
+    
+    /**
+     * Should the files be compiled individually before compiling them as a whole.
+     * 
+     * This can help when trying to diagnose a compilation error
+     * @parameter default-value="false"
+     */
+    private Boolean compileIndividualFiles;
 
     /**
      * JoinSet definitions to join groups of coffee files into a single .js file
@@ -63,90 +67,102 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      * @parameter
      * @required
      */
-    private List<JoinSet> joinSets;
+    private List<JoinSet> coffeeJoinSets;
+
+    
+    // following parameters are for minification
+    
     
     /**
 	 * @parameter expression= "${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js"
 	 * @required
 	 */
     private String minifiedFile;
-
+    
+    /**
+     * Location of the Files to Minify.  Defaults to ${build.directory}/coffee
+     * 
+     * @parameter expression="${project.build.directory}/coffee"
+     */
+    private File directoryOfFilesToMinify;
+    
+    /**
+     * The set of files that should be minified.  Be sure to specify the path to the compiled   
+     * 
+     * Only one or the other of setOfFilesToMinify or directoryOfFilesToMinify should be specified.  Only setOfFilesToMinify is used if both are specified.
+     * 
+     * @parameter
+     */
+    private FileSet setOfFilesToMinify;    
+    
+    
     public void execute() throws MojoExecutionException {
 
         CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(bare);
         
         try {
-        	compileCoffeeFiles(gatherCoffeeFiles(), coffeeScriptCompiler);
+        	if(compileIndividualFiles){
+        		getLog().info("Starting individual compilations of files");
+        		
+        		for (JoinSet joinSet : coffeeJoinSets) {
+        			for(File file : joinSet.getFiles()){
+        				getLog().info("Compiling File " + file.getName() +  " in JoinSet:" + joinSet.getId());
+                		coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
+        			}
+            	}
+        	}
         	
-        	minifyJavascriptFiles();
-            
+        	for (JoinSet joinSet : coffeeJoinSets) {
+        		getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
+        		
+        		String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
+        		
+        		write(joinSet.getId(), compiled);
+        	}
+        	
+        	minify();
+        	
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
-
-    private Map<File, JoinSetSource> gatherCoffeeFiles() throws IOException, MojoExecutionException {
-        Map<File, JoinSetSource> coffeeSuppliers = Maps.newHashMap();
-
-        if (joinSets != null) {
-          for (JoinSet joinSet : joinSets) {
-
-            String description = joinSet.getId();
-            
-            getLog().info("JoinSet" + joinSet.getId());
-            
-            StringBuilder joinSetFileContents = new StringBuilder();
-            
-            for (File file : joinSet.getFiles()) {
-                if (!file.exists()) {
-                    throw new MojoExecutionException(String.format("JoinSet %s references missing file: %s", joinSet.getId(), file.getPath()));
-                }
-
-                InputSupplier<InputStreamReader> readerSupplier = Files.newReaderSupplier(file, Charsets.UTF_8);
-                joinSetFileContents.append(CharStreams.toString(readerSupplier));
-                joinSetFileContents.append("\n");
-            }
-            
-            File jsFileName = new File(outputDirectory, joinSet.getId() + ".js");
-            coffeeSuppliers.put(jsFileName, new JoinSetSource(description, joinSetFileContents.toString()));
-          }
+    
+    private void write(final String fileName, final String contents) throws IOException{ 
+        //Create the new Javascript file path
+        File jsFile = new File(coffeeOutputDirectory, fileName + ".js");
+        if (!jsFile.getParentFile().exists()) {
+            jsFile.getParentFile().mkdirs();
         }
-
-        return coffeeSuppliers;
+            
+        Files.write(contents, jsFile, Charsets.UTF_8);
     }
     
-    private void compileCoffeeFiles(final Map<File, JoinSetSource> coffeeSuppliers, 
-    		final CoffeeScriptCompiler coffeeScriptCompiler) throws IOException {
-
-    	for (Map.Entry<File, JoinSetSource> entry : coffeeSuppliers.entrySet()) {
-            getLog().info(String.format("Compiling %s", entry.getValue().description));
-            
-            //Get the coffee file contents and compile it into some javascript.
-            String coffeeSupplier = entry.getValue().source;
-            String js = coffeeScriptCompiler.compile(coffeeSupplier);
-
-            //Create the new Javascript file path
-            File jsFile = entry.getKey();
-            if (!jsFile.getParentFile().exists()) {
-                jsFile.getParentFile().mkdirs();
-            }
-            
-            Files.write(js, jsFile, Charsets.UTF_8);
-        }
-    }
-    
-    private void minifyJavascriptFiles(){
-    	ClosureMinifier minifier = new ClosureMinifier();
-    	minifier.compile(outputDirectory.getAbsolutePath(), minifiedFile);
-    }
-    
-    private class JoinSetSource {
-        final String description;
-        final String source;
-
-        private JoinSetSource(String description, String source) {
-            this.description = description;
-            this.source = source;
-        }
-    }
+    /**
+     * This is pretty much just a copy of the code in the JavaScriptMinifierMojo class, will remove once I figure out how to run goals in sequence.
+     */
+    public void minify() throws MojoExecutionException, MojoFailureException, IOException {
+	    getLog().info("Minifying all Javascript Files in the Output Directory");
+	   	ClosureMinifier minifier = new ClosureMinifier(getLog());
+	    	
+	   	List<File> filesToMinify;
+	   	if(null!=setOfFilesToMinify){
+	   		getLog().debug("Configured a fileset for minification");
+	   		filesToMinify = FileUtilities.fileSetToFileList(setOfFilesToMinify);
+    	}else{
+    		getLog().debug("Configured a directory for minification");
+    		filesToMinify = FileUtilities.directoryToFileList(directoryOfFilesToMinify.getAbsolutePath());
+    	}
+	   	
+	   	//check for dest file in source files, if present remove it.
+	   	List<File> filesToMinifyMinusDestFile = Lists.newArrayList();
+	   	for(File file : filesToMinify){
+	   		if(!file.getAbsolutePath().equals(minifiedFile)){
+	   			filesToMinifyMinusDestFile.add(file);
+	   		}
+	   	}
+	    	
+    	getLog().info("About to minify the following files:  " + FileUtilities.getCommaSeparatedListOfFileNames(filesToMinifyMinusDestFile));
+	    	
+    	minifier.compile(filesToMinifyMinusDestFile, minifiedFile);
+	}
 }
