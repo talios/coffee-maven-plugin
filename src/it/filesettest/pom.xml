@@ -26,13 +26,26 @@
                         <id>coffee</id>
                         <goals>
                             <goal>coffee</goal>
+                            <goal>minify</goal>
                         </goals>
                     </execution>
                 </executions>
 
                 <configuration>
                 	<minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
-                    <joinSets>
+                	<setOfFilesToMinify>
+                		<directory>${project.build.directory}/coffee</directory>
+                		<includes>
+                			<include>*.js</include>
+                		</includes>
+                		<excludes>
+                			<exclude>alternate.js</exclude>
+                		</excludes>
+                	</setOfFilesToMinify>
+                	
+                	<coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
+                	<compileIndividualFiles>true</compileIndividualFiles>
+                    <coffeeJoinSets>
                         <joinSet>
                             <id>main</id>
                             <fileSet>
@@ -54,7 +67,7 @@
                             	</includes>
                             </fileSet>
                         </joinSet>
-                    </joinSets>
+                    </coffeeJoinSets>
                 </configuration>
 
             </plugin>
