@@ -14,7 +14,7 @@ Add the main plugin elements:  groupId, artifactId, and version
     <plugin>
       <groupId>com.theoryinpractise</groupId>
       <artifactId>coffee-maven-plugin</artifactId>
-      <version>1.2.1</version>
+      <version>1.4.0</version>
     </plugin>
 
 Add the execution goal
@@ -28,24 +28,37 @@ Add the execution goal
       </execution>
     </executions>
 
-Configure the destination of the resultant js file
+Configure the destination of the resultant js files
 
-    <outputDirectory>${project.build.directory}/coffee</outputDirectory>
+    <coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
 
 Specify bare (see coffeescript compiler documentation)
 
     <bare>false</bare>
+    
+It can be tough to debug compilation errors with the files joined together.  If you would like to compile the Files individually
+    <compileIndividualFiles>true</compileIndividualFiles>
 
 Finally, add JoinSets.  The id of the joinSet will be the name of the resultant javascript file.
 
-    <joinSets>
+    <coffeeJoinSets>
       <joinSet>
         <id>main</id>
+          <fileSet>
+          </fileSet>
       </joinSet>
-    </joinSets>
+    </coffeeJoinSets>
 
 Optionally, specify a minified file location.  It defaults to:  
     <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
+
+Finally, you can specify a directory of files to minify into one file, 
+    <directoryOfFilesToMinify></directoryOfFilesToMinify>
+
+or a fileset of files to minify into one file
+    <setOfFilesToMinify>
+    
+    </setOfFilesToMinify>
 
 An Example Build Section:
 
@@ -57,32 +70,42 @@ An Example Build Section:
           <version>1.3.1</version>
           
           <configuration>
-            <outputDirectory>${project.build.directory}/coffee</outputDirectory>
-            <bare>false</bare>
-            <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
-            <joinSets>
-              <joinSet>
-                <id>main</id>
-                <fileSet>
-                  <directory>${basedir}/src/main/coffee</directory>
-                  <includes>
-                    <include>**/*.coffee</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**/jointest3.*</exclude>
-                  </excludes>
-                </fileSet>
-              </joinSet>
-              <joinSet>
-                <id>alternate</id>
-                <fileSet>
-                  <directory>${basedir}/src/main/coffee</directory>
-                  <includes>
-                    <include>**/jointest3.*</include>
-                  </includes>
-                </fileSet>
-              </joinSet>
-            </joinSets>
+             <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
+             <setOfFilesToMinify>
+             	<directory>${project.build.directory}/coffee</directory>
+             	<includes>
+             		<include>*.js</include>
+             	</includes>
+             	<excludes>
+             		<exclude>alternate.js</exclude>
+             	</excludes>
+             </setOfFilesToMinify>
+             
+             <coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
+             <compileIndividualFiles>true</compileIndividualFiles>
+             <coffeeJoinSets>
+                <joinSet>
+                    <id>main</id>
+                    <fileSet>
+                    	<directory>${basedir}/src/main/coffee</directory>
+                    	<includes>
+                    		<include>**/*.coffee</include>
+                    	</includes>
+                    	<excludes>
+                    		<exclude>**/jointest3.*</exclude>
+                    	</excludes>
+                    </fileSet>
+                </joinSet>
+                <joinSet>
+                    <id>alternate</id>
+                    <fileSet>
+                    	<directory>${basedir}/src/main/coffee</directory>
+                    	<includes>
+                    		<include>**/jointest3.*</include>
+                    	</includes>
+                    </fileSet>
+                </joinSet>
+             </coffeeJoinSets>
           </configuration>
           
           <executions>
