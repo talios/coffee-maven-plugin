@@ -33,6 +33,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.google.common.collect.Iterables.transform;
 
@@ -66,6 +68,13 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private Boolean bare;
 
     /**
+     * Should we compile as bare?
+     *
+     * @parameter default-value="1.1.3"
+     */
+    private String version;
+
+    /**
      * An optional set of joinSet definitions which will join groups of coffee files into
      * a single .js file
      *
@@ -75,7 +84,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
-        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(bare);
+        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version, bare);
 
         if (!coffeeDir.exists()) {
             throw new MojoExecutionException("Coffee source directory not found: " + coffeeDir.getPath());
@@ -143,7 +152,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
           for (JoinSet joinSet : joinSets) {
 
             String description = String.format(
-                    "joingset %s (containing %s)",
+                    "joinset %s (containing %s)",
                     joinSet.getId(),
                     Joiner.on(", ").join(transform(joinSet.getFiles(), simpleFileName)));
 

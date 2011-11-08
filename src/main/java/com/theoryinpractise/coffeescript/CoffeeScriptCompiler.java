@@ -15,10 +15,10 @@ public class CoffeeScriptCompiler {
     private final Scriptable globalScope;
     private boolean bare;
 
-    public CoffeeScriptCompiler(boolean bare) {
+    public CoffeeScriptCompiler(String version, boolean bare) {
 
         this.bare = bare;
-        InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getResource("/coffee-script-1.1.2.js"), Charsets.UTF_8);
+        InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getResource(String.format("/coffee-script-%s.js", version)), Charsets.UTF_8);
         Context context = Context.enter();
         context.setOptimizationLevel(-1); // Without this, Rhino hits a 64K bytecode limit and fails
         try {
