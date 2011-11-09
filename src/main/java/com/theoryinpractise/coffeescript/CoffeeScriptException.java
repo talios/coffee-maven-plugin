@@ -1,6 +1,6 @@
 package com.theoryinpractise.coffeescript;
 
-/*
+/**
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:

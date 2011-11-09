@@ -10,7 +10,7 @@ import org.mozilla.javascript.Scriptable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/*
+/**
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:

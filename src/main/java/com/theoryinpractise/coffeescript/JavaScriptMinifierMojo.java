@@ -9,7 +9,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import java.io.File;
 import java.util.List;
 
-/*
+/**
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-/*
+/**
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:

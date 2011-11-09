@@ -1,6 +1,15 @@
 package com.theoryinpractise.coffeescript;
 
-/*
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+/**
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:
@@ -17,20 +26,8 @@ package com.theoryinpractise.coffeescript;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import org.apache.maven.model.FileSet;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-/**
+ *
+ *
  * Compile CoffeeScript with Maven
  *
  * @goal coffee
@@ -78,34 +75,6 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      * @required
      */
     private List<JoinSet> coffeeJoinSets;
-
-
-    // following parameters are for minification
-
-
-    /**
-     * @parameter expression= "${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js"
-     * @required
-     */
-    private String minifiedFile;
-
-    /**
-     * Location of the Files to Minify.  Defaults to ${build.directory}/coffee
-     *
-     * @parameter expression="${project.build.directory}/coffee"
-     */
-    private File directoryOfFilesToMinify;
-
-    /**
-     * The set of files that should be minified.  Be sure to specify the path to the compiled
-     * <p/>
-     * Only one or the other of setOfFilesToMinify or directoryOfFilesToMinify should be specified.
-     * Only setOfFilesToMinify is used if both are specified.
-     *
-     * @parameter
-     */
-    private FileSet setOfFilesToMinify;
-
 
     public void execute() throws MojoExecutionException {
 

@@ -42,7 +42,7 @@
                 			<exclude>alternate.js</exclude>
                 		</excludes>
                 	</setOfFilesToMinify>
-                	
+
                 	<coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
                 	<compileIndividualFiles>true</compileIndividualFiles>
                     <coffeeJoinSets>

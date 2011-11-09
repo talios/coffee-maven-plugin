@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-/*
+/**
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:
