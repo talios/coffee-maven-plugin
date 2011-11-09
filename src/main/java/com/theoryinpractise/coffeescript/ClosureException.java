@@ -17,17 +17,17 @@ package com.theoryinpractise.coffeescript;
  */
 
 /**
- * Class to wrap Javascript CoffeeScript Compiler Errors
+ * Wrap Closure Compiler Errors
  *
  */
-public class CoffeeScriptException extends RuntimeException {
-    private static final long serialVersionUID = 2449069058134279751L;
+public class ClosureException extends RuntimeException {
+	private static final long serialVersionUID = 2449069058134279759L;
 
-	public CoffeeScriptException(String message) {
-        super(message);
-    }
-	
-	public CoffeeScriptException(String message, Throwable t) {
-        super(message, t);
-    }
+	public ClosureException(String message) {
+		super(message);
+	}
+
+	public ClosureException(String message, Throwable t) {
+		super(message, t);
+	}
 }
