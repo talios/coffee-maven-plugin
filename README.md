@@ -81,6 +81,7 @@ An Example Build Section:
              	</excludes>
              </setOfFilesToMinify>
 
+             <version>1.1.3</version>
              <coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
              <compileIndividualFiles>true</compileIndividualFiles>
              <coffeeJoinSets>
