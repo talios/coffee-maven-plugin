@@ -113,6 +113,7 @@ An Example Build Section:
               <id>coffee</id>
               <goals>
                 <goal>coffee</goal>
+                <goal>minify</goal>
               </goals>
             </execution>
           </executions>
