@@ -1,7 +1,20 @@
 package com.theoryinpractise.coffeescript;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.Resources;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.Scriptable;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /*
  * Copyright 2011 Mark Derricutt.
+ *
+ * Contributing authors:
+ *   Daniel Bower
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +27,8 @@ package com.theoryinpractise.coffeescript;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-import com.google.common.base.Charsets;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Resources;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.Scriptable;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-/**
+ *
+ *
  * Wrapper around the coffee-script compiler from https://github.com/jashkenas/coffee-script/
  *
  */

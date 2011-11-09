@@ -1,7 +1,19 @@
 package com.theoryinpractise.coffeescript;
 
+import com.google.common.collect.Lists;
+import org.apache.maven.model.FileSet;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+
+import java.io.File;
+import java.util.List;
+
 /*
  * Copyright 2011 Mark Derricutt.
+ *
+ * Contributing authors:
+ *   Daniel Bower
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +26,9 @@ package com.theoryinpractise.coffeescript;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-
-import com.google.common.collect.Lists;
-import org.apache.maven.model.FileSet;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-
-import java.io.File;
-import java.util.List;
-
-/**
+ *
  * Minify JavaScript with Maven
+ *
  * @goal minify
  * @phase process-classes
  */
