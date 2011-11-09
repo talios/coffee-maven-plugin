@@ -1,7 +1,7 @@
 package com.theoryinpractise.coffeescript;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2011 Mark Derricutt.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,20 @@ package com.theoryinpractise.coffeescript;
  * limitations under the License.
  */
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.google.javascript.jscomp.*;
+import com.google.javascript.jscomp.Compiler;
+import org.apache.maven.plugin.logging.Log;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.plugin.logging.Log;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import com.google.javascript.jscomp.CommandLineRunner;
-import com.google.javascript.jscomp.CompilationLevel;
-import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSError;
-import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.Result;
-
 /**
  * Run the Closure Compiler tool on a directory of Javascripts.
- * 
+ *
  * This class supports no configuration in its current form.
  *
  */
@@ -44,29 +38,29 @@ public class ClosureMinifier {
 	public ClosureMinifier(Log logger){
 		this.logger = logger;
 	}
-	
+
 	public ClosureMinifier(String compilationLevel, Log logger){
 		this.compilationLevel = compilationLevel;
 		this.logger = logger;
 	}
-	
+
 	private Log logger;
 	private String compilationLevel = CompilationLevel.SIMPLE_OPTIMIZATIONS.toString();
-	
+
 	public void compile(List<File> filesToCompile, String destFileName){
 		File destFile = prepareDestFile(destFileName);
-		
+
 		Compiler compiler = new Compiler();
 		Result results = compiler.compile(getExterns(), getInputs(filesToCompile), getCompilerOptions());
-		
-		logger.debug(results.debugLog);		
+
+		logger.debug(results.debugLog);
 		for(JSError error : results.errors){
 			logger.error("Closure Minifier Error:  " + error.sourceName + "  Description:  " +  error.description);
 		}
 		for(JSError warning : results.warnings){
 			logger.info("Closure Minifier Warning:  " + warning.sourceName + "  Description:  " +  warning.description);
 		}
-		
+
 		if (results.success) {
 			try {
 				Files.write(compiler.toSource(), destFile, Charsets.UTF_8);
@@ -77,7 +71,7 @@ public class ClosureMinifier {
 			throw new ClosureException("Closure Compiler Failed - See error messages on System.err");
 		}
 	}
-	
+
 	/**
 	 * Prepare the Destination File, Remove if it already exists
 	 * @param destFileName
@@ -89,7 +83,7 @@ public class ClosureMinifier {
 		}
 		return destFile;
 	}
-	
+
 	/**
 	 * Prepare options for the Compiler.
 	 */
@@ -106,35 +100,35 @@ public class ClosureMinifier {
 
 		return options;
 	}
-	
+
 	/**
-	 * Externs are defined in the Closure documentations as:  
-	 * External variables are declared in 'externs' files. For instance, the file may include 
+	 * Externs are defined in the Closure documentations as:
+	 * External variables are declared in 'externs' files. For instance, the file may include
 	 * definitions for global javascript/browser objects such as window, document.
-	 * 
-	 * This method sneaks into the CommandLineRunner class of the Closure command line tool 
-	 * and pulls the default Externs there.  This class could be modified to instead look 
+	 *
+	 * This method sneaks into the CommandLineRunner class of the Closure command line tool
+	 * and pulls the default Externs there.  This class could be modified to instead look
 	 * somewhere more relevant to the project.
 	 */
 	private JSSourceFile[] getExterns(){
-		
+
 		List<JSSourceFile> externs = Lists.newArrayList();
 		try {
 			externs = CommandLineRunner.getDefaultExterns();
-			
+
 		} catch (IOException e) {
 			throw new ClosureException("Unable to load default External variables Files. The files include definitions for global javascript/browser objects such as window, document.", e);
 		}
 		return externs.toArray(new JSSourceFile[externs.size()]);
 	}
-	
+
 	private JSSourceFile[] getInputs(List<File> filesToProcess){
 		List<JSSourceFile> files = Lists.newArrayList();
-		
+
 		for(File file : filesToProcess){
 			files.add(JSSourceFile.fromFile(file));
 		}
-		
+
 		return files.toArray(new JSSourceFile[files.size()]);
 	}
 

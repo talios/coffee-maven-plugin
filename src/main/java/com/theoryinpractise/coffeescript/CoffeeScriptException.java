@@ -1,7 +1,7 @@
 package com.theoryinpractise.coffeescript;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2011 Mark Derricutt.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@ package com.theoryinpractise.coffeescript;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-/**
+ *
+ *
  * Class to wrap Javascript CoffeeScript Compiler Errors
  *
  */
@@ -26,7 +25,7 @@ public class CoffeeScriptException extends RuntimeException {
 	public CoffeeScriptException(String message) {
         super(message);
     }
-	
+
 	public CoffeeScriptException(String message, Throwable t) {
         super(message, t);
     }
