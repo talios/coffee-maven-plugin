@@ -59,7 +59,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private String version;
 
     /**
-     * Should the files be compiled individually before compiling them as a whole.
+     * Should the files be compiled individually or as a whole.
      * <p/>
      * This can help when trying to diagnose a compilation error
      *
@@ -89,7 +89,9 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                     StringBuilder compiled = new StringBuilder();
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
-                        compiled.append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)));
+                        compiled
+                            .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)))
+                            .append("\n");
                     }
                     write(joinSet.getId(), compiled.toString());
                 }
