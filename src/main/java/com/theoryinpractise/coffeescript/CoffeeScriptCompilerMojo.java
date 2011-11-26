@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -87,7 +88,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                 for (JoinSet joinSet : coffeeJoinSets) {
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
-                        coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
+                        coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8));
                     }
                 }
             }
