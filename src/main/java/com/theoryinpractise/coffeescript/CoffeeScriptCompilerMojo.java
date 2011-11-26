@@ -63,7 +63,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private Boolean bare;
 
     /**
-     * Should we compile as bare?
+     * What version of Coffee-Script should we compile with?
      *
      * @parameter default-value="1.1.3"
      */

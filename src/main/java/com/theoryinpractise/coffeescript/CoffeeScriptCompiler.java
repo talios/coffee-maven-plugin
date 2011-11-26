@@ -6,49 +6,55 @@ import com.google.common.io.Resources;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.commonjs.module.Require;
+import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
+import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
+import sun.tools.jar.resources.jar;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
 
 /**
  * Copyright 2011 Mark Derricutt.
- *
+ * <p/>
  * Contributing authors:
- *   Daniel Bower
- *
+ * Daniel Bower
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- *
+ * <p/>
+ * <p/>
  * Wrapper around the coffee-script compiler from https://github.com/jashkenas/coffee-script/
- *
  */
 public class CoffeeScriptCompiler {
 
-	private String coffeeScriptCompilerScriptBase = "/coffee-script-%s.js";
-
-    private final Scriptable globalScope;
     private boolean bare;
+    private String version;
+    private final Scriptable globalScope;
+    private Scriptable coffeeScript;
 
     public CoffeeScriptCompiler(String version, boolean bare) {
-        final String coffeeScriptCompilerScript = String.format(coffeeScriptCompilerScriptBase, version);
         this.bare = bare;
-        InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getResource(String.format("/coffee-script-%s.js", version)), Charsets.UTF_8);
-        Context context = Context.enter();
-        context.setOptimizationLevel(-1); // Without this, Rhino hits a 64K bytecode limit and fails
+        this.version = version;
+
         try {
+            Context context = createContext();
             globalScope = context.initStandardObjects();
-            context.evaluateReader(globalScope, supplier.getInput(), coffeeScriptCompilerScript, 0, null);
-        } catch (IOException e1) {
+            final Require require = getSandboxedRequire(context, globalScope, true);
+            coffeeScript = require.requireMain(context, "coffee-script");
+        } catch (Exception e1) {
             throw new CoffeeScriptException("Unable to load the coffeeScript compiler into Rhino", e1);
         } finally {
             Context.exit();
@@ -56,11 +62,16 @@ public class CoffeeScriptCompiler {
 
     }
 
+    private void compileFile(Context context, String sourcePath, String fileName) throws IOException {
+        InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getResource(sourcePath), Charsets.UTF_8);
+        context.evaluateReader(globalScope, supplier.getInput(), fileName, 0, null);
+    }
+
     public String compile(String coffeeScriptSource) {
         Context context = Context.enter();
         try {
-            Scriptable compileScope = context.newObject(globalScope);
-            compileScope.setParentScope(globalScope);
+            Scriptable compileScope = context.newObject(coffeeScript);
+            compileScope.setParentScope(coffeeScript);
             compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
             try {
 
@@ -68,7 +79,7 @@ public class CoffeeScriptCompiler {
 
                 return (String) context.evaluateString(
                         compileScope,
-                        String.format("CoffeeScript.compile(coffeeScript, %s);", options),
+                        String.format("compile(coffeeScript, %s);", options),
                         "source", 0, null);
             } catch (JavaScriptException e) {
                 throw new CoffeeScriptException(e.getMessage(), e);
@@ -76,6 +87,28 @@ public class CoffeeScriptCompiler {
         } finally {
             Context.exit();
         }
+    }
+
+    private Context createContext() {
+        Context context = Context.enter();
+        context.setOptimizationLevel(-1); // Without this, Rhino hits a 64K bytecode limit and fails
+        return context;
+    }
+
+    private Require getSandboxedRequire(final Context cx) throws URISyntaxException {
+        return getSandboxedRequire(cx, cx.initStandardObjects(), true);
+    }
+
+    private Require getSandboxedRequire(Context cx, Scriptable scope, boolean sandboxed) throws URISyntaxException {
+        return new Require(cx, cx.initStandardObjects(),
+                new StrongCachingModuleScriptProvider(
+                        new UrlModuleSourceProvider(Collections.singleton(
+                                getDirectory()), null)), null, null, true);
+    }
+
+    private URI getDirectory() throws URISyntaxException {
+        final String resourcePath = String.format("/coffee-script-%s/", version);
+        return getClass().getResource(resourcePath).toURI();
     }
 
 }
