@@ -86,19 +86,21 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                 getLog().info("Starting individual compilations of files");
 
                 for (JoinSet joinSet : coffeeJoinSets) {
+                    StringBuilder compiled = new StringBuilder();
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
-                        coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8));
+                        compiled.append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)));
                     }
+                    write(joinSet.getId(), compiled.toString());
                 }
-            }
+            } else {
+                for (JoinSet joinSet : coffeeJoinSets) {
+                    getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
 
-            for (JoinSet joinSet : coffeeJoinSets) {
-                getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
+                    String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
 
-                String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
-
-                write(joinSet.getId(), compiled);
+                    write(joinSet.getId(), compiled);
+                }
             }
 
         } catch (Exception e) {
