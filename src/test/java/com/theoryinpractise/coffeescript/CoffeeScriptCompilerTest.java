@@ -6,7 +6,7 @@ public class CoffeeScriptCompilerTest {
 
     @Test
     public void testCompiler() {
-        CoffeeScriptCompiler compiler = new CoffeeScriptCompiler("1.1.3", true);
+//        CoffeeScriptCompiler compiler = new CoffeeScriptCompiler("1.1.3", true);
 
     }
 

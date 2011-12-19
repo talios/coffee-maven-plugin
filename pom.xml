@@ -76,10 +76,37 @@
                 <configuration>
                     <artifactSet>
                         <includes>
+                            <include>args4j:args4j</include>
                             <include>org.mozilla:rhino</include>
+                            <include>com.google.javascript:closure-compiler</include>
                         </includes>
                     </artifactSet>
+                    <!--<relocations>-->
+                        <!--<relocation>-->
+                            <!--<pattern>org.mozilla.javascript</pattern>-->
+                            <!--<shadedPattern>com.theoryinpractise.coffeescript.javascript</shadedPattern>-->
+                            <!--<excludes>-->
+                                <!--&lt;!&ndash;<exclude>org.mozilla.javascript.Context</exclude>&ndash;&gt;-->
+                                <!--<exclude>org.mozilla.classfile.ByteCode</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ClassFileField</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ClassFileMethod</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ClassFileWriter</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ConstantPool</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ExceptionTableEntry</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.FieldOrMethodRef</exclude>-->
+                                <!--<exclude>org.mozilla.javascript.NativeFunction</exclude>-->
+                            <!--</excludes>-->
+                        <!--</relocation>-->
+                    <!--</relocations>-->
                 </configuration>
+
+                <!--<configuration>-->
+                <!--<artifactSet>-->
+                <!--<includes>-->
+                <!--<include>org.mozilla:rhino</include>-->
+                <!--</includes>-->
+                <!--</artifactSet>-->
+                <!--</configuration>-->
                 <executions>
                     <execution>
                         <phase>package</phase>
