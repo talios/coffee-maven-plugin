@@ -1,43 +1,38 @@
 package com.theoryinpractise.coffeescript;
 
-/*
- * Copyright 2001-2005 The Apache Software Foundation.
- *
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Copyright 2011 Mark Derricutt.
+ * <p/>
+ * Contributing authors:
+ * Daniel Bower
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.collect.Iterables.transform;
-
-/**
- * Goal which touches a timestamp file.
+ * <p/>
+ * <p/>
+ * Compile CoffeeScript with Maven
  *
  * @goal coffee
  * @phase compile
@@ -45,49 +40,114 @@ import static com.google.common.collect.Iterables.transform;
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     /**
+     * Default location of .coffee source files.
+     *
      * @parameter expression="${basedir}/src/main/coffee"
      * @required
      */
-    protected File coffeeDir;
+    private File coffeeDir;
 
     /**
-     * Location of the file.
+     * Location of the output files from the Coffee Compiler.  Defaults to ${build.directory}/coffee
      *
      * @parameter expression="${project.build.directory}/coffee"
      * @required
      */
-    private File outputDirectory;
+    private File coffeeOutputDirectory;
 
     /**
-     * Should we compile as bare?
+     * Should we compile as bare?  A compiler option for the Coffee Compiler.
      *
      * @parameter default-value="false"
      */
     private Boolean bare;
 
     /**
-     * An optional set of joinSet definitions which will join groups of coffee files into
-     * a single .js file
+     * What version of Coffee-Script should we compile with?
+     *
+     * @parameter default-value="1.2.0"
+     */
+    private String version;
+
+    /**
+     * Should the files be compiled individually or as a whole.
+     * <p/>
+     * This can help when trying to diagnose a compilation error
+     *
+     * @parameter default-value="false"
+     */
+    private Boolean compileIndividualFiles;
+
+    /**
+     * JoinSet definitions to join groups of coffee files into a single .js file
+     * Individual Joinsets contain an id element to name the file that will be output and a maven
+     * FileSet to define what files are included.
      *
      * @parameter
      */
-    private List<JoinSet> joinSets;
+    private List<JoinSet> coffeeJoinSets;
 
     public void execute() throws MojoExecutionException {
 
-        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(bare);
-
-        if (!coffeeDir.exists()) {
-            throw new MojoExecutionException("Coffee source directory not found: " + coffeeDir.getPath());
-        }
+        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version, bare);
 
         try {
-            compileCoffeeFilesInDirector(coffeeScriptCompiler, coffeeDir);
+            if (compileIndividualFiles) {
+                getLog().info("Starting individual compilations of files");
+
+                for (JoinSet joinSet : findJoinSets()) {
+                    StringBuilder compiled = new StringBuilder();
+                    for (File file : joinSet.getFiles()) {
+                        getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
+                        compiled
+                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)))
+                                .append("\n");
+                    }
+                    write(joinSet.getId(), compiled.toString());
+                }
+            } else {
+                for (JoinSet joinSet : findJoinSets()) {
+                    getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
+
+                    String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
+
+                    write(joinSet.getId(), compiled);
+                }
+            }
+
         } catch (Exception e) {
-            throw new MojoExecutionException(e.getMessage());
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
+
+    private List<JoinSet> findJoinSets() {
+        if (coffeeJoinSets != null && !coffeeJoinSets.isEmpty()) {
+            return coffeeJoinSets;
+        } else {
+            // Generate a joinset for each .coffee file
+            return Lists.transform(findCoffeeFilesInDirectory(coffeeDir), new Function<File, JoinSet>() {
+                public JoinSet apply(@Nullable File file) {
+                    return new StaticJoinSet(file);
+                }
+            });
+        }
+    }
+
+    private static class StaticJoinSet extends JoinSet {
+        private File file;
+
+        private StaticJoinSet(File file) {
+            this.file = file;
+            String name = file.getPath().substring(file.getParent().length() + 1);
+            setId(name.substring(0, name.lastIndexOf(".")));
         }
 
+        @Override
+        public List<File> getFiles() throws IOException {
+            return ImmutableList.of(file);
+        }
     }
+
 
     private List<File> findCoffeeFilesInDirectory(File coffeeDir) {
 
@@ -109,85 +169,14 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         return coffeeFiles;
     }
 
-    private class JoinSetSource {
-        final String description;
-        final InputSupplier<? extends Reader> inputSupplier;
-
-        private JoinSetSource(String description, InputSupplier<? extends Reader> inputSupplier) {
-            this.description = description;
-            this.inputSupplier = inputSupplier;
-        }
-    }
-
-    private void compileCoffeeFilesInDirector(final CoffeeScriptCompiler coffeeScriptCompiler, final File coffeeDir)
-            throws IOException, MojoExecutionException {
-
-        List<File> coffeeFiles = findCoffeeFilesInDirectory(coffeeDir);
-
-        Map<File, JoinSetSource> coffeeSuppliers = Maps.newHashMap();
-
-        Function<String,File> prependCoffeeDirToFiles = new Function<String, File>() {
-            public File apply(String file) {
-                return file == null ? null : new File(coffeeDir, file);
-            }
-        };
-
-        Function<String,String> simpleFileName = new Function<String, String>() {
-            public String apply(String file) {
-                return file == null ? null : file.substring(file.lastIndexOf("/") + 1);
-            }
-        };
-
-        // Map joinsets
-        if (joinSets != null) {
-          for (JoinSet joinSet : joinSets) {
-
-            String description = String.format(
-                    "joingset %s (containing %s)",
-                    joinSet.getId(),
-                    Joiner.on(", ").join(transform(joinSet.getFiles(), simpleFileName)));
-
-            List<InputSupplier<InputStreamReader>> joinSetSuppliers = Lists.newArrayList();
-            for (File file : transform(joinSet.getFiles(), prependCoffeeDirToFiles)) {
-                if (!file.exists()) {
-                    throw new MojoExecutionException(String.format("JoinSet %s references missing file: %s", joinSet.getId(), file.getPath()));
-                }
-
-                InputSupplier<InputStreamReader> readerSupplier = Files.newReaderSupplier(file, Charsets.UTF_8);
-                joinSetSuppliers.add(readerSupplier);
-                coffeeFiles.remove(file);
-            }
-
-            InputSupplier<Reader> joinSetSupplier = CharStreams.join(joinSetSuppliers);
-            File jsFileName = new File(outputDirectory, joinSet.getId() + ".js");
-            coffeeSuppliers.put(jsFileName, new JoinSetSource(description, joinSetSupplier));
-
-          }
-        }
-
-        // Map remaining files
-        for (File coffeeFile : coffeeFiles) {
-            String jsFileName = coffeeFile.getPath().substring(coffeeDir.getPath().length()).replace(".coffee", ".js");
-            File jsFile = new File(outputDirectory, jsFileName);
-            coffeeSuppliers.put(jsFile, new JoinSetSource(coffeeFile.getName(), Files.newReaderSupplier(coffeeFile, Charsets.UTF_8)));
-        }
-
-        for (Map.Entry<File, JoinSetSource> entry : coffeeSuppliers.entrySet()) {
-            getLog().info(String.format("Compiling %s", entry.getValue().description));
-            compileCoffeeFile(coffeeScriptCompiler, entry.getKey(), entry.getValue().inputSupplier);
-        }
-
-    }
-
-    private void compileCoffeeFile(CoffeeScriptCompiler coffeeScriptCompiler, File jsFile, InputSupplier<? extends Reader> coffeeSupplier) throws IOException {
-
+    private void write(final String fileName, final String contents) throws IOException {
+        //Create the new Javascript file path
+        File jsFile = new File(coffeeOutputDirectory, fileName + ".js");
         if (!jsFile.getParentFile().exists()) {
             jsFile.getParentFile().mkdirs();
         }
 
-        String js = coffeeScriptCompiler.compile(CharStreams.toString(coffeeSupplier));
-
-        Files.write(js, jsFile, Charsets.UTF_8);
-
+        Files.write(contents, jsFile, Charsets.UTF_8);
     }
+
 }

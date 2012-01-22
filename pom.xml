@@ -3,7 +3,7 @@
     <groupId>com.theoryinpractise</groupId>
     <artifactId>coffee-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.4.1-SNAPSHOT</version>
     <name>Coffeescript Maven Plugin</name>
     <description>A Maven 2.0 plugin for compiling coffeescript into javascript</description>
     <url>https://github.com/talios/coffee-maven-plugin</url>
@@ -20,6 +20,12 @@
             <email>mark@talios.com</email>
             <url>http://twitter.com/talios</url>
         </developer>
+        <developer>
+            <id>danieldbower</id>
+            <name>Daniel Bower</name>
+            <email>daniel@bowerstudios.com</email>
+            <url>http://bowerstudios.com</url>
+        </developer>
     </developers>
 
     <licenses>
@@ -27,6 +33,16 @@
             <name>Apache License</name>
         </license>
     </licenses>
+
+    <repositories>
+        <repository>
+            <id>repo</id>
+            <url>file://${basedir}/repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <distributionManagement>
         <repository>
@@ -70,18 +86,64 @@
         </profile>
     </profiles>
 
-    <repositories>
-        <repository>
-            <id>repo</id>
-            <url>file://${basedir}/repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <artifactSet>
+                        <includes>
+                            <include>args4j:args4j</include>
+                            <include>org.mozilla:rhino</include>
+                            <include>com.google.javascript:closure-compiler</include>
+                        </includes>
+                    </artifactSet>
+                    <!--<relocations>-->
+                        <!--<relocation>-->
+                            <!--<pattern>org.mozilla.javascript</pattern>-->
+                            <!--<shadedPattern>com.theoryinpractise.coffeescript.javascript</shadedPattern>-->
+                            <!--<excludes>-->
+                                <!--&lt;!&ndash;<exclude>org.mozilla.javascript.Context</exclude>&ndash;&gt;-->
+                                <!--<exclude>org.mozilla.classfile.ByteCode</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ClassFileField</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ClassFileMethod</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ClassFileWriter</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ConstantPool</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.ExceptionTableEntry</exclude>-->
+                                <!--<exclude>org.mozilla.classfile.FieldOrMethodRef</exclude>-->
+                                <!--<exclude>org.mozilla.javascript.NativeFunction</exclude>-->
+                            <!--</excludes>-->
+                        <!--</relocation>-->
+                    <!--</relocations>-->
+                </configuration>
+
+                <!--<configuration>-->
+                <!--<artifactSet>-->
+                <!--<includes>-->
+                <!--<include>org.mozilla:rhino</include>-->
+                <!--</includes>-->
+                <!--</artifactSet>-->
+                <!--</configuration>-->
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>1.5</version>
@@ -111,25 +173,46 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>head</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.javascript</groupId>
+            <artifactId>closure-compiler</artifactId>
+            <version>r1459</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mozilla</groupId>
+                    <artifactId>rhino</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>2.0</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>r09</version>
+            <version>10.0.1</version>
         </dependency>
         <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>rhino</artifactId>
-            <version>1.7R3</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.2.1</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
 </project>
