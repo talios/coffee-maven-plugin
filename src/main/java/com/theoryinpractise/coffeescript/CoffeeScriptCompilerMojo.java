@@ -103,7 +103,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                                 .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)))
                                 .append("\n");
                     }
-                    write(joinSet.getId(), compiled.toString());
+                    write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled.toString());
                 }
             } else {
                 for (JoinSet joinSet : findJoinSets()) {
@@ -111,7 +111,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
                     String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
 
-                    write(joinSet.getId(), compiled);
+                    write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled);
                 }
             }
 
@@ -169,9 +169,13 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         return coffeeFiles;
     }
 
-    private void write(final String fileName, final String contents) throws IOException {
+    private void write(final File joinSetOutputDirectory, final String fileName, final String contents) throws IOException {
         //Create the new Javascript file path
-        File jsFile = new File(coffeeOutputDirectory, fileName + ".js");
+        File outputDirectory = coffeeOutputDirectory;
+        if (joinSetOutputDirectory != null) {
+            outputDirectory = joinSetOutputDirectory;
+        }
+        File jsFile = new File(outputDirectory, fileName + ".js");
         if (!jsFile.getParentFile().exists()) {
             jsFile.getParentFile().mkdirs();
         }
