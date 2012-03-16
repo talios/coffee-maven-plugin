@@ -44,10 +44,14 @@ Finally, add JoinSets.  The id of the joinSet will be the name of the resultant 
     <coffeeJoinSets>
       <joinSet>
         <id>main</id>
-          <fileSet>
-          </fileSet>
+        <coffeeOutputDirectory>${project.build.directory}/other-directory</coffeeOutputDirectory>
+        <fileSet>
+        </fileSet>
       </joinSet>
     </coffeeJoinSets>
+
+The output directory for an individual joinsets can also be overridden by setting <coffeeOutputDirectory/> inside
+the <joinSet/> element.
 
 Optionally, specify a minified file location.  It defaults to:
     <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
