@@ -26,3 +26,8 @@ file = new File( basedir, "target/coffee/alternate.js" );
 if ( !file.isFile() ) {
   throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file);
 }
+
+file = new File( basedir, "target/coffee/alternate/alternate-directory.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file);
+}

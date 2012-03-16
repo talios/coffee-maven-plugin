@@ -67,6 +67,16 @@
                             	</includes>
                             </fileSet>
                         </joinSet>
+                        <joinSet>
+                            <id>alternate-directory</id>
+                            <coffeeOutputDirectory>${project.build.directory}/coffee/alternate</coffeeOutputDirectory>
+                            <fileSet>
+                            	<directory>${basedir}/src/main/coffee</directory>
+                            	<includes>
+                            		<include>**/jointest3.*</include>
+                            	</includes>
+                            </fileSet>
+                        </joinSet>
                     </coffeeJoinSets>
                 </configuration>
 
