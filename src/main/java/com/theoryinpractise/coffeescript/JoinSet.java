@@ -38,6 +38,14 @@ public class JoinSet {
 
     private String id;
 
+    /**
+     * Location of the output files from the Coffee Compiler. Defaults to the value for coffeeOutputDirectory specified
+     * in the main configuration if it is not specified within this JoinSet.
+     *
+     * @parameter expression="${project.build.directory}/coffee"
+     */
+    private File coffeeOutputDirectory;
+
     private FileSet fileSet;
 
     /**
@@ -59,6 +67,19 @@ public class JoinSet {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    public File getCoffeeOutputDirectory() {
+        return coffeeOutputDirectory;
+    }
+
+    /**
+     * A location where to put the output javascript(s) for this specific JoinSet.
+     * 
+     * @param coffeeOutputDirectory
+     */
+    public void setCoffeeOutputDirectory(File coffeeOutputDirectory) {
+        this.coffeeOutputDirectory = coffeeOutputDirectory;
     }
 
     /**
