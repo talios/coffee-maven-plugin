@@ -52,7 +52,8 @@ public class CoffeeScriptCompiler {
         try {
             Context context = createContext();
             globalScope = context.initStandardObjects();
-            final Require require = getSandboxedRequire(context, globalScope, true);
+            final Require require = getSandboxedRequire(context, globalScope, false);
+            require.install(globalScope);
             coffeeScript = require.requireMain(context, "coffee-script");
         } catch (Exception e1) {
             throw new CoffeeScriptException("Unable to load the coffeeScript compiler into Rhino", e1);
@@ -107,7 +108,7 @@ public class CoffeeScriptCompiler {
     }
 
     private URI getDirectory() throws URISyntaxException {
-        final String resourcePath = String.format("/coffee-script-%s/", version);
+        final String resourcePath = String.format("/coffee-script-%s", version);
         return getClass().getResource(resourcePath).toURI();
     }
 

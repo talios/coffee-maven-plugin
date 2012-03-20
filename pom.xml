@@ -106,35 +106,10 @@
                         <includes>
                             <include>args4j:args4j</include>
                             <include>org.mozilla:rhino</include>
-                            <include>com.google.javascript:closure-compiler</include>
                         </includes>
                     </artifactSet>
-                    <!--<relocations>-->
-                        <!--<relocation>-->
-                            <!--<pattern>org.mozilla.javascript</pattern>-->
-                            <!--<shadedPattern>com.theoryinpractise.coffeescript.javascript</shadedPattern>-->
-                            <!--<excludes>-->
-                                <!--&lt;!&ndash;<exclude>org.mozilla.javascript.Context</exclude>&ndash;&gt;-->
-                                <!--<exclude>org.mozilla.classfile.ByteCode</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ClassFileField</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ClassFileMethod</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ClassFileWriter</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ConstantPool</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ExceptionTableEntry</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.FieldOrMethodRef</exclude>-->
-                                <!--<exclude>org.mozilla.javascript.NativeFunction</exclude>-->
-                            <!--</excludes>-->
-                        <!--</relocation>-->
-                    <!--</relocations>-->
                 </configuration>
 
-                <!--<configuration>-->
-                <!--<artifactSet>-->
-                <!--<includes>-->
-                <!--<include>org.mozilla:rhino</include>-->
-                <!--</includes>-->
-                <!--</artifactSet>-->
-                <!--</configuration>-->
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -178,17 +153,6 @@
             <version>head</version>
         </dependency>
         <dependency>
-            <groupId>com.google.javascript</groupId>
-            <artifactId>closure-compiler</artifactId>
-            <version>r1459</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mozilla</groupId>
-                    <artifactId>rhino</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.1</version>
@@ -206,13 +170,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>10.0.1</version>
+            <version>11.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.2.1</version>
+            <version>6.4</version>
         </dependency>
-
     </dependencies>
 </project>
