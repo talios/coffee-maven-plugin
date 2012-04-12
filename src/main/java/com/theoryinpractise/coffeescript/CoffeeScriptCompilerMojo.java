@@ -1,7 +1,9 @@
 package com.theoryinpractise.coffeescript;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -65,7 +67,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     /**
      * What version of Coffee-Script should we compile with?
      *
-     * @parameter default-value="1.2.0"
+     * @parameter default-value="1.3.1"
      */
     private String version;
 
@@ -87,8 +89,21 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      */
     private List<JoinSet> coffeeJoinSets;
 
+    @VisibleForTesting
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1");
+
     public void execute() throws MojoExecutionException {
 
+        if (!acceptableVersions.contains(version)) {
+
+            String error = String.format("Unsupported version of coffee-script specified (%s) - supported versions: %s",
+                                                version,
+                                                Joiner.on(", ").join(acceptableVersions));
+
+            throw new MojoExecutionException(error);
+        }
+
+        getLog().info(String.format("coffee-maven-plugin using coffee script version %s", version));
         CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version, bare);
 
         try {
