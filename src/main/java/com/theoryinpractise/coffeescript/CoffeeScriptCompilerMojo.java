@@ -90,7 +90,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private List<JoinSet> coffeeJoinSets;
 
     @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1");
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3");
 
     public void execute() throws MojoExecutionException {
 
