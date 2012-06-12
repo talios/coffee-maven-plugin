@@ -9,7 +9,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
-import sun.tools.jar.resources.jar;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

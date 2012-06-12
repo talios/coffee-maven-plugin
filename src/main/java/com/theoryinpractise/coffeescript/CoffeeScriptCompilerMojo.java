@@ -67,7 +67,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     /**
      * What version of Coffee-Script should we compile with?
      *
-     * @parameter default-value="1.3.1"
+     * @parameter default-value="1.3.3"
      */
     private String version;
 
