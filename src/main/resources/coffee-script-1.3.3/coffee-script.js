@@ -3,15 +3,15 @@
   var Lexer, RESERVED, compile, fs, lexer, parser, path, vm, _ref,
     __hasProp = {}.hasOwnProperty;
 
-  fs = require('fs');
+//  fs = require('fs');
 
-  path = require('path');
+//  path = require('path');
 
   _ref = require('./lexer'), Lexer = _ref.Lexer, RESERVED = _ref.RESERVED;
 
   parser = require('./parser').parser;
 
-  vm = require('vm');
+//  vm = require('vm');
 
   if (require.extensions) {
     require.extensions['.coffee'] = function(module, filename) {
