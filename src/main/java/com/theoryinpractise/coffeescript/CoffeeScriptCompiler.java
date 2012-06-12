@@ -9,7 +9,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
-import sun.tools.jar.resources.jar;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -95,15 +94,11 @@ public class CoffeeScriptCompiler {
         return context;
     }
 
-    private Require getSandboxedRequire(final Context cx) throws URISyntaxException {
-        return getSandboxedRequire(cx, cx.initStandardObjects(), true);
-    }
-
     private Require getSandboxedRequire(Context cx, Scriptable scope, boolean sandboxed) throws URISyntaxException {
         return new Require(cx, cx.initStandardObjects(),
                 new StrongCachingModuleScriptProvider(
                         new UrlModuleSourceProvider(Collections.singleton(
-                                getDirectory()), null)), null, null, true);
+                                getDirectory()), null)), null, null, sandboxed);
     }
 
     private URI getDirectory() throws URISyntaxException {
