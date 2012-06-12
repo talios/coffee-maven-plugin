@@ -9,12 +9,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
+import com.google.common.io.CharStreams;
+import org.dynjs.api.Scope;
+import org.dynjs.runtime.DynJS;
+import org.dynjs.runtime.DynJSConfig;
+import org.dynjs.runtime.DynThreadContext;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
 
 /**
  * Copyright 2011 Mark Derricutt.
@@ -41,69 +42,35 @@ public class CoffeeScriptCompiler {
 
     private boolean bare;
     private String version;
-    private final Scriptable globalScope;
-    private Scriptable coffeeScript;
+    private DynThreadContext compileContext;
+    private DynJS dynJs;
 
     public CoffeeScriptCompiler(String version, boolean bare) {
         this.bare = bare;
         this.version = version;
 
         try {
-            Context context = createContext();
-            globalScope = context.initStandardObjects();
-            final Require require = getSandboxedRequire(context, globalScope, true);
-            coffeeScript = require.requireMain(context, "coffee-script");
+            compileContext = new DynThreadContext();
+            DynJSConfig config = new DynJSConfig();
+            dynJs = new DynJS(config);
+            dynJs.eval(compileContext, CharStreams.toString(new InputStreamReader(CoffeeScriptCompiler.class.getResourceAsStream(String.format("/coffee-script-%s.js", version)))));
         } catch (Exception e1) {
-            throw new CoffeeScriptException("Unable to load the coffeeScript compiler into Rhino", e1);
-        } finally {
-            Context.exit();
+            throw new CoffeeScriptException("Unable to load the coffeeScript compiler", e1);
         }
 
-    }
-
-    private void compileFile(Context context, String sourcePath, String fileName) throws IOException {
-        InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getResource(sourcePath), Charsets.UTF_8);
-        context.evaluateReader(globalScope, supplier.getInput(), fileName, 0, null);
     }
 
     public String compile(String coffeeScriptSource) {
-        Context context = Context.enter();
-        try {
-            Scriptable compileScope = context.newObject(coffeeScript);
-            compileScope.setParentScope(coffeeScript);
-            compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
-            try {
 
-                String options = bare ? "{bare: true}" : "{}";
+        Scope scope = compileContext.getScope();
+        scope.define("coffeeScript", coffeeScriptSource);
+        String options = bare ? "{bare: true}" : "{}";
 
-                return (String) context.evaluateString(
-                        compileScope,
-                        String.format("compile(coffeeScript, %s);", options),
-                        "source", 0, null);
-            } catch (JavaScriptException e) {
-                throw new CoffeeScriptException(e.getMessage(), e);
-            }
-        } finally {
-            Context.exit();
-        }
-    }
+        dynJs.eval(compileContext,
+                   String.format("val target = compile(coffeeScript, %s);", options),
+                   "source");
 
-    private Context createContext() {
-        Context context = Context.enter();
-        context.setOptimizationLevel(9); // Enable optimization
-        return context;
-    }
-
-    private Require getSandboxedRequire(Context cx, Scriptable scope, boolean sandboxed) throws URISyntaxException {
-        return new Require(cx, cx.initStandardObjects(),
-                new StrongCachingModuleScriptProvider(
-                        new UrlModuleSourceProvider(Collections.singleton(
-                                getDirectory()), null)), null, null, sandboxed);
-    }
-
-    private URI getDirectory() throws URISyntaxException {
-        final String resourcePath = String.format("/coffee-script-%s/", version);
-        return getClass().getResource(resourcePath).toURI();
+        return (String) compileContext.getScope().resolve("target");
     }
 
 }

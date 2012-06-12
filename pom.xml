@@ -173,8 +173,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>rhino</artifactId>
+            <groupId>me.qmx</groupId>
+            <artifactId>dynjs</artifactId>
             <version>head</version>
         </dependency>
         <dependency>
