@@ -187,7 +187,7 @@
         <dependency>
             <groupId>org.dynjs</groupId>
             <artifactId>dynjs</artifactId>
-            <version>head</version>
+            <version>1.x.incremental.416</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
