@@ -185,7 +185,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>me.qmx</groupId>
+            <groupId>org.dynjs</groupId>
             <artifactId>dynjs</artifactId>
             <version>head</version>
         </dependency>
