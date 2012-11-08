@@ -42,6 +42,18 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>projectodd-upstream</id>
+            <name>project:odd Upstream Builds</name>
+            <url>https://repository-projectodd.forge.cloudbees.com/upstream</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <distributionManagement>
@@ -173,9 +185,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>me.qmx</groupId>
+            <groupId>org.dynjs</groupId>
             <artifactId>dynjs</artifactId>
-            <version>head</version>
+            <version>1.x.incremental.416</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
