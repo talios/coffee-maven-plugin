@@ -1,8 +1,10 @@
 package com.theoryinpractise.coffeescript;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
+import java.io.File;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -37,7 +39,7 @@ import java.util.Collections;
  * <p/>
  * Wrapper around the coffee-script compiler from https://github.com/jashkenas/coffee-script/
  */
-public class CoffeeScriptCompiler {
+public class CoffeeScriptCompiler implements Compiler {
 
     private boolean bare;
     private String version;
@@ -66,23 +68,24 @@ public class CoffeeScriptCompiler {
         context.evaluateReader(globalScope, supplier.getInput(), fileName, 0, null);
     }
 
-    public String compile(String coffeeScriptSource) {
+    public String compile(File source) {
         Context context = Context.enter();
         try {
-            Scriptable compileScope = context.newObject(coffeeScript);
-            compileScope.setParentScope(coffeeScript);
-            compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
-            try {
+						String coffeeScriptSource = Files.toString(source, Charsets.UTF_8);
+						Scriptable compileScope = context.newObject(coffeeScript);
+						compileScope.setParentScope(coffeeScript);
+						compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
 
-                String options = bare ? "{bare: true}" : "{}";
+						String options = bare ? "{bare: true}" : "{}";
 
-                return (String) context.evaluateString(
-                        compileScope,
-                        String.format("compile(coffeeScript, %s);", options),
-                        "source", 0, null);
-            } catch (JavaScriptException e) {
-                throw new CoffeeScriptException(e.getMessage(), e);
-            }
+						return (String) context.evaluateString(
+										compileScope,
+										String.format("compile(coffeeScript, %s);", options),
+										"source", 0, null);
+				} catch (IOException e) {
+						throw new CoffeeScriptException(e.getMessage(), e);
+				} catch (JavaScriptException e) {
+						throw new CoffeeScriptException(e.getMessage(), e);
         } finally {
             Context.exit();
         }

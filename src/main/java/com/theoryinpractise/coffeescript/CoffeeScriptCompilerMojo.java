@@ -12,6 +12,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -104,7 +105,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
 
         getLog().info(String.format("coffee-maven-plugin using coffee script version %s", version));
-        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version, bare);
+        Compiler coffeeScriptCompiler = CompilerFactory.newInstance(version, bare);
 
         try {
             if (compileIndividualFiles) {
@@ -115,7 +116,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
                         compiled
-                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)))
+                                .append(coffeeScriptCompiler.compile(file))
                                 .append("\n");
                     }
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled.toString());
@@ -124,7 +125,10 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                 for (JoinSet joinSet : findJoinSets()) {
                     getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
 
-                    String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
+										File tempFile = File.createTempFile("coffee-", ".js");
+										new FileOutputStream(tempFile).write(joinSet.getConcatenatedStringOfFiles().getBytes());
+                    String compiled = coffeeScriptCompiler.compile(tempFile);
+										tempFile.delete();
 
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled);
                 }
