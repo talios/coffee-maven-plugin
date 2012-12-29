@@ -1,5 +1,7 @@
 package com.theoryinpractise.coffeescript;
 
+import com.theoryinpractise.coffeescript.compiler.CompilerFactory;
+import com.theoryinpractise.coffeescript.compiler.CoffeeScriptCompiler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
@@ -105,7 +107,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
 
         getLog().info(String.format("coffee-maven-plugin using coffee script version %s", version));
-        Compiler coffeeScriptCompiler = CompilerFactory.newInstance(version, bare);
+        CoffeeScriptCompiler coffeeScriptCompiler = CompilerFactory.newInstance(version, bare);
 
         try {
             if (compileIndividualFiles) {

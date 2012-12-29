@@ -1,9 +1,11 @@
-package com.theoryinpractise.coffeescript;
+package com.theoryinpractise.coffeescript.compiler;
 
+import com.theoryinpractise.coffeescript.compiler.CoffeeScriptCompiler;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
+import com.theoryinpractise.coffeescript.CoffeeScriptException;
 import java.io.File;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
@@ -39,14 +41,14 @@ import java.util.Collections;
  * <p/>
  * Wrapper around the coffee-script compiler from https://github.com/jashkenas/coffee-script/
  */
-public class CoffeeScriptCompiler implements Compiler {
+public class RhinoCompiler implements CoffeeScriptCompiler {
 
     private boolean bare;
     private String version;
     private final Scriptable globalScope;
     private Scriptable coffeeScript;
 
-    public CoffeeScriptCompiler(String version, boolean bare) {
+    public RhinoCompiler(String version, boolean bare) {
         this.bare = bare;
         this.version = version;
 

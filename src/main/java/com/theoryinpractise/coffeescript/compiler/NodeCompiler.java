@@ -1,5 +1,6 @@
-package com.theoryinpractise.coffeescript;
+package com.theoryinpractise.coffeescript.compiler;
 
+import com.theoryinpractise.coffeescript.CoffeeScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -9,11 +10,15 @@ import org.apache.commons.io.IOUtils;
  *
  * @author thrykol
  */
-public class NodeCompiler implements Compiler {
+public class NodeCompiler implements CoffeeScriptCompiler {
 
 	boolean bare;
 
-	public NodeCompiler(String executable, boolean bare) {
+	public NodeCompiler() {
+		this("", false);
+	}
+
+	public NodeCompiler(String version, boolean bare) {
 		this.bare = bare;
 	}
 

@@ -2,13 +2,13 @@ package com.theoryinpractise.coffeescript;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
+import com.theoryinpractise.coffeescript.compiler.CoffeeScriptCompiler;
+import com.theoryinpractise.coffeescript.compiler.CompilerFactory;
+import com.theoryinpractise.coffeescript.compiler.NodeCompiler;
 import java.io.File;
 import java.util.Iterator;
 import javax.annotation.Nullable;
-import static org.junit.Assume.assumeTrue;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 /**
@@ -34,7 +34,7 @@ public class NodeCompilerTest {
 
 	@Test(dataProvider = "provideVersions")
 	public void testCompile(final String version) throws Exception {
-		Compiler compiler = CompilerFactory.newInstance(version, false);
+		CoffeeScriptCompiler compiler = CompilerFactory.newInstance(version, false);
 
 		if (compiler instanceof NodeCompiler) {
 			File file = new File("target/test-classes/sample.coffee");
