@@ -12,4 +12,6 @@ import java.io.File;
  */
 public interface Compiler {
 	public String compile(File source);
+
+	public String[] commands();
 }

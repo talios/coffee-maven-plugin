@@ -91,6 +91,10 @@ public class CoffeeScriptCompiler implements Compiler {
         }
     }
 
+		public String[] commands() {
+			return new String[]{};
+		}
+
     private Context createContext() {
         Context context = Context.enter();
         context.setOptimizationLevel(9); // Enable optimization

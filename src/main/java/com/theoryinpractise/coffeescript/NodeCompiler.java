@@ -44,4 +44,8 @@ public class NodeCompiler implements Compiler {
 			throw new CoffeeScriptException(ex.getMessage(), ex);
 		}
 	}
+
+	public String[] commands() {
+		return new String[]{"sh","cat","coffee"};
+	}
 }
