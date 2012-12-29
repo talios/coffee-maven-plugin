@@ -8,7 +8,7 @@ import java.io.File;
 
 /**
  *
- * @author shane
+ * @author thrykol
  */
 public interface Compiler {
 	public String compile(File source);

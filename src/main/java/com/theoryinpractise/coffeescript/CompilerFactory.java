@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.theoryinpractise.coffeescript;
 
 import java.io.IOException;
@@ -11,7 +7,7 @@ import org.apache.commons.lang.SystemUtils;
 
 /**
  *
- * @author shane
+ * @author thrykol
  */
 public abstract class CompilerFactory {
 	public static Compiler newInstance(String version, boolean bare) {
@@ -34,7 +30,6 @@ public abstract class CompilerFactory {
 	}
 
 	private static boolean _linux() throws IOException, InterruptedException {
-		System.out.println("Checking for command");
 		Process p = Runtime.getRuntime().exec(
 						new String[]{"which","coffee"});
 
