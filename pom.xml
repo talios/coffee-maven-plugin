@@ -113,6 +113,9 @@
                             <include>org.mozilla:rhino</include>
                             <include>com.google.javascript:closure-compiler</include>
                             <include>org.dynjs:dynjs</include>
+                            <include>me.qmx.jitescript:jitescript</include>
+                            <include>org.projectodd.linkfusion:linkfusion</include>
+                            <include>org.ow2.asm:asm-debug-all</include>
                         </includes>
                     </artifactSet>
                 </configuration>
@@ -157,7 +160,7 @@
         <dependency>
             <groupId>org.dynjs</groupId>
             <artifactId>dynjs</artifactId>
-            <version>1.x.incremental.436</version>
+            <version>1.x.incremental.491</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
