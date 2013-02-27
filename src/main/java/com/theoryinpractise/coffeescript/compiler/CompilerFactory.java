@@ -1,10 +1,8 @@
 package com.theoryinpractise.coffeescript.compiler;
 
-import com.theoryinpractise.coffeescript.compiler.NodeCompiler;
-import com.theoryinpractise.coffeescript.compiler.RhinoCompiler;
-import com.theoryinpractise.coffeescript.compiler.CoffeeScriptCompiler;
-import java.io.IOException;
 import org.apache.commons.lang.SystemUtils;
+
+import java.io.IOException;
 
 /**
  *
@@ -23,7 +21,7 @@ public abstract class CompilerFactory {
 		CoffeeScriptCompiler compiler = null;
 
 		try {
-			if (SystemUtils.IS_OS_LINUX && _linux(NodeCompiler.class)) {
+			if (nodeIsSupport() && nodeisAvailable()) {
 				compiler = new NodeCompiler("coffee", bare);
 			}
 		} catch (Exception ex) {
@@ -37,9 +35,13 @@ public abstract class CompilerFactory {
 		return compiler;
 	}
 
-	private static boolean _linux(Class<? extends CoffeeScriptCompiler> klass) throws IOException, InterruptedException, InstantiationException, IllegalAccessException {
+    private static boolean nodeIsSupport() {
+        return SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_MAC_OSX;
+    }
+
+    private static boolean nodeisAvailable() throws IOException, InterruptedException, InstantiationException, IllegalAccessException {
 		boolean result = true;
-		for (String cmd : klass.newInstance().commands()) {
+		for (String cmd : NodeCompiler.class.newInstance().commands()) {
 			Process p = Runtime.getRuntime().exec(
 							new String[]{"which", cmd});
 
