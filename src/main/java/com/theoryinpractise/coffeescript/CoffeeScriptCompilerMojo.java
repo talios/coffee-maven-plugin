@@ -67,7 +67,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     /**
      * What version of Coffee-Script should we compile with?
      *
-     * @parameter default-value="1.3.3"
+     * @parameter default-value="1.5.0"
      */
     private String version;
 
@@ -90,7 +90,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private List<JoinSet> coffeeJoinSets;
 
     @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3");
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0");
 
     public void execute() throws MojoExecutionException {
 

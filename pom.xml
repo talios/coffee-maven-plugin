@@ -34,16 +34,6 @@
         </license>
     </licenses>
 
-    <repositories>
-        <repository>
-            <id>repo</id>
-            <url>file://${basedir}/repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <repository>
             <id>sonatype-staging</id>
@@ -175,7 +165,7 @@
         <dependency>
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
-            <version>head</version>
+            <version>1.7R4</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
