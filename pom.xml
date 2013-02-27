@@ -3,7 +3,7 @@
     <groupId>com.theoryinpractise</groupId>
     <artifactId>coffee-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.4.4-SNAPSHOT</version>
+    <version>1.4.5-SNAPSHOT</version>
     <name>Coffeescript Maven Plugin</name>
     <description>A Maven 2.0 plugin for compiling coffeescript into javascript</description>
     <url>https://github.com/talios/coffee-maven-plugin</url>
@@ -33,16 +33,6 @@
             <name>Apache License</name>
         </license>
     </licenses>
-
-    <repositories>
-        <repository>
-            <id>repo</id>
-            <url>file://${basedir}/repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
     <distributionManagement>
         <repository>
@@ -175,7 +165,7 @@
         <dependency>
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
-            <version>head</version>
+            <version>1.7R4</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>

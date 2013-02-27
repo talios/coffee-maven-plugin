@@ -90,7 +90,7 @@ public class CoffeeScriptCompiler {
 
     private Context createContext() {
         Context context = Context.enter();
-        context.setOptimizationLevel(9); // Without this, Rhino hits a 64K bytecode limit and fails
+        context.setOptimizationLevel(9); // Enable optimization
         return context;
     }
 

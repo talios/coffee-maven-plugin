@@ -23,8 +23,13 @@ public class CoffeeScriptCompilerTest {
 
     @Test(dataProvider = "provideVersions")
     public void testCompiler(final String version) {
-        CoffeeScriptCompiler compiler = new CoffeeScriptCompiler(version, true);
+        new CoffeeScriptCompiler(version, true);
+    }
 
+    @Test(dataProvider = "provideVersions")
+    public void testCompilation(final String version) {
+        CoffeeScriptCompiler compiler = new CoffeeScriptCompiler(version, true);
+        compiler.compile("string   = \"file3\"");
     }
 
 }
