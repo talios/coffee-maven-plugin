@@ -1,8 +1,5 @@
 package com.theoryinpractise.coffeescript;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Resources;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -10,8 +7,6 @@ import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -39,13 +34,11 @@ import java.util.Collections;
  */
 public class CoffeeScriptCompiler {
 
-    private boolean bare;
     private String version;
     private final Scriptable globalScope;
     private Scriptable coffeeScript;
 
-    public CoffeeScriptCompiler(String version, boolean bare) {
-        this.bare = bare;
+    public CoffeeScriptCompiler(String version) {
         this.version = version;
 
         try {
@@ -61,12 +54,7 @@ public class CoffeeScriptCompiler {
 
     }
 
-    private void compileFile(Context context, String sourcePath, String fileName) throws IOException {
-        InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getResource(sourcePath), Charsets.UTF_8);
-        context.evaluateReader(globalScope, supplier.getInput(), fileName, 0, null);
-    }
-
-    public String compile(String coffeeScriptSource) {
+    public String compile(String coffeeScriptSource, String sourceName, boolean bare, boolean literate) {
         Context context = Context.enter();
         try {
             Scriptable compileScope = context.newObject(coffeeScript);
@@ -74,12 +62,12 @@ public class CoffeeScriptCompiler {
             compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
             try {
 
-                String options = bare ? "{bare: true}" : "{}";
+                String options = String.format("{bare: %s, literate: %s}", bare, literate);
 
                 return (String) context.evaluateString(
                         compileScope,
                         String.format("compile(coffeeScript, %s);", options),
-                        "source", 0, null);
+                        sourceName, 0, null);
             } catch (JavaScriptException e) {
                 throw new CoffeeScriptException(e.getMessage(), e);
             }
