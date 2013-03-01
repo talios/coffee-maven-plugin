@@ -68,6 +68,15 @@
                             </fileSet>
                         </joinSet>
                         <joinSet>
+                            <id>literate</id>
+                            <fileSet>
+                            	<directory>${basedir}/src/main/coffee</directory>
+                            	<includes>
+                            		<include>**/litjointest.*</include>
+                            	</includes>
+                            </fileSet>
+                        </joinSet>
+                        <joinSet>
                             <id>alternate-directory</id>
                             <coffeeOutputDirectory>${project.build.directory}/coffee/alternate</coffeeOutputDirectory>
                             <fileSet>

@@ -115,7 +115,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
                         compiled
-                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8), file.getName(), bare, joinSet.isLiterate()))
+                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8), file.getName(), bare, file.getName().endsWith(".litcoffee")))
                                 .append("\n");
                     }
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled.toString());
