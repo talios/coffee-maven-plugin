@@ -104,7 +104,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
 
         getLog().info(String.format("coffee-maven-plugin using coffee script version %s", version));
-        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version, bare);
+        CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version);
 
         try {
             if (compileIndividualFiles) {
@@ -115,7 +115,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
                         compiled
-                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8)))
+                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8), file.getName(), bare, joinSet.isLiterate()))
                                 .append("\n");
                     }
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled.toString());
@@ -124,7 +124,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                 for (JoinSet joinSet : findJoinSets()) {
                     getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
 
-                    String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles());
+                    String sourceName = joinSet.getId() + (joinSet.isLiterate() ? ".litcoffee" : ".coffee");
+                    String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles(), sourceName, bare, joinSet.isLiterate());
 
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled);
                 }
@@ -140,21 +141,30 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             return coffeeJoinSets;
         } else {
             // Generate a joinset for each .coffee file
-            return Lists.transform(findCoffeeFilesInDirectory(coffeeDir), new Function<File, JoinSet>() {
-                public JoinSet apply(@Nullable File file) {
-                    return new StaticJoinSet(file);
-                }
-            });
+            return ImmutableList.<JoinSet>builder()
+                    .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee", false))
+                    .addAll(findJoinSetsInDirectory(coffeeDir, ".litcoffee", true))
+                    .build();
+
         }
+    }
+
+    private List<JoinSet> findJoinSetsInDirectory(final File coffeeDir, final String suffix, final boolean literate) {
+        return Lists.transform(findCoffeeFilesInDirectory(coffeeDir, suffix), new Function<File, JoinSet>() {
+            public JoinSet apply(@Nullable File file) {
+                return new StaticJoinSet(file, literate);
+            }
+        });
     }
 
     private static class StaticJoinSet extends JoinSet {
         private File file;
 
-        private StaticJoinSet(File file) {
+        private StaticJoinSet(File file, boolean literate) {
             this.file = file;
             String name = file.getPath().substring(file.getParent().length() + 1);
             setId(name.substring(0, name.lastIndexOf(".")));
+            setLiterate(literate);
         }
 
         @Override
@@ -164,18 +174,17 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     }
 
 
-    private List<File> findCoffeeFilesInDirectory(File coffeeDir) {
+    private List<File> findCoffeeFilesInDirectory(File coffeeDir, final String suffix) {
 
         List<File> coffeeFiles = Lists.newArrayList();
 
         File[] files = coffeeDir.listFiles();
 
         for (File file : files) {
-
             if (file.isDirectory()) {
-                coffeeFiles.addAll(findCoffeeFilesInDirectory(file));
+                coffeeFiles.addAll(findCoffeeFilesInDirectory(file, suffix));
             } else {
-                if (file.getPath().endsWith(".coffee")) {
+                if (file.getPath().endsWith(suffix)) {
                     coffeeFiles.add(file);
                 }
             }
