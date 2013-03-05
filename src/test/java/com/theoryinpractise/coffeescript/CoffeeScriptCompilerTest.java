@@ -29,7 +29,8 @@ public class CoffeeScriptCompilerTest {
     @Test(dataProvider = "provideVersions")
     public void testCompilation(final String version) {
         CoffeeScriptCompiler compiler = new CoffeeScriptCompiler(version);
-        compiler.compile("string   = \"file3\"", "test", true, false);
+        CoffeeScriptCompiler.SourceMap sourceMap = "1.6.1".equals(version) ? CoffeeScriptCompiler.SourceMap.V3 : CoffeeScriptCompiler.SourceMap.NONE;
+        compiler.compile("string   = \"file3\"", "test", true, sourceMap, true, false);
     }
 
 }

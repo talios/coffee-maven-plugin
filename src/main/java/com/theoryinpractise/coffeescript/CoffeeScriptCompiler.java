@@ -1,7 +1,9 @@
 package com.theoryinpractise.coffeescript;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
@@ -34,8 +36,8 @@ import java.util.Collections;
  */
 public class CoffeeScriptCompiler {
 
-    private String version;
     private final Scriptable globalScope;
+    private String version;
     private Scriptable coffeeScript;
 
     public CoffeeScriptCompiler(String version) {
@@ -54,20 +56,37 @@ public class CoffeeScriptCompiler {
 
     }
 
-    public String compile(String coffeeScriptSource, String sourceName, boolean bare, boolean literate) {
+    public CompileResult compile(String coffeeScriptSource, String sourceName, boolean bare, SourceMap map, boolean header, boolean literate) {
         Context context = Context.enter();
         try {
             Scriptable compileScope = context.newObject(coffeeScript);
             compileScope.setParentScope(coffeeScript);
             compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
             try {
-
-                String options = String.format("{bare: %s, literate: %s}", bare, literate);
-
-                return (String) context.evaluateString(
+                boolean useMap = map != SourceMap.NONE;
+                String options = String.format("{bare: %s, sourceMap: %s, literate: %s, header: %s, filename: '%s'}", bare, useMap, literate, header, sourceName);
+                Object result = context.evaluateString(
                         compileScope,
                         String.format("compile(coffeeScript, %s);", options),
                         sourceName, 0, null);
+
+                if (map == SourceMap.NONE) {
+                    return new CompileResult((String) result, null);
+                } else {
+
+                    NativeObject nativeObject = (NativeObject) result;
+                    String js = nativeObject.get("js").toString();
+                    String sourceMap;
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        sourceMap = objectMapper.writeValueAsString(nativeObject.get("v3SourceMap"));
+                    } catch (Exception e) {
+                        sourceMap = null;
+                    }
+                    
+                    return new CompileResult(js, sourceMap);
+                }
+
             } catch (JavaScriptException e) {
                 throw new CoffeeScriptException(e.getMessage(), e);
             }
@@ -84,14 +103,16 @@ public class CoffeeScriptCompiler {
 
     private Require getSandboxedRequire(Context cx, Scriptable scope, boolean sandboxed) throws URISyntaxException {
         return new Require(cx, cx.initStandardObjects(),
-                new StrongCachingModuleScriptProvider(
-                        new UrlModuleSourceProvider(Collections.singleton(
-                                getDirectory()), null)), null, null, sandboxed);
+                           new StrongCachingModuleScriptProvider(
+                                   new UrlModuleSourceProvider(Collections.singleton(
+                                           getDirectory()), null)), null, null, sandboxed);
     }
 
     private URI getDirectory() throws URISyntaxException {
         final String resourcePath = String.format("/coffee-script-%s/", version);
         return getClass().getResource(resourcePath).toURI();
     }
+
+    public static enum SourceMap {NONE, V3}
 
 }

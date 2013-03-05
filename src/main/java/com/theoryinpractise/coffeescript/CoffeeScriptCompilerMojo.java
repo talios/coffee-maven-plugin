@@ -65,9 +65,23 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private Boolean bare;
 
     /**
+     * Should we generate source maps when compiling?
+     *
+     * @parameter default-value="false"
+     */
+    private Boolean map;
+
+    /**
+     * Should we generate source maps when compiling?
+     *
+     * @parameter default-value="true"
+     */
+    private Boolean header;
+
+    /**
      * What version of Coffee-Script should we compile with?
      *
-     * @parameter default-value="1.5.0"
+     * @parameter default-value="1.6.1"
      */
     private String version;
 
@@ -90,9 +104,17 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private List<JoinSet> coffeeJoinSets;
 
     @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0");
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1");
 
     public void execute() throws MojoExecutionException {
+
+        if (compileIndividualFiles && map) {
+            throw new MojoExecutionException("Unable to generate source maps when compiling joinsets individually");
+        }
+
+        if (map && !version.equals("1.6.1")) {
+            throw new MojoExecutionException("CoffeeScript 1.6.1 is required for using source maps");
+        }
 
         if (!acceptableVersions.contains(version)) {
 
@@ -115,17 +137,17 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
                         compiled
-                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8), file.getName(), bare, file.getName().endsWith(".litcoffee")))
+                                .append(coffeeScriptCompiler.compile(Files.toString(file, Charsets.UTF_8), file.getName(), bare, getSourceMapType(), header, file.getName().endsWith(".litcoffee")).getJs())
                                 .append("\n");
                     }
-                    write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled.toString());
+                    write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), new CompileResult(compiled.toString(), null));
                 }
             } else {
                 for (JoinSet joinSet : findJoinSets()) {
                     getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
 
                     String sourceName = joinSet.getId() + (joinSet.isLiterate() ? ".litcoffee" : ".coffee");
-                    String compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles(), sourceName, bare, joinSet.isLiterate());
+                    CompileResult compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles(), sourceName, bare, getSourceMapType(), header, joinSet.isLiterate());
 
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled);
                 }
@@ -133,6 +155,14 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
+
+    public CoffeeScriptCompiler.SourceMap getSourceMapType() {
+        if (map) {
+            return CoffeeScriptCompiler.SourceMap.V3;
+        } else {
+            return CoffeeScriptCompiler.SourceMap.NONE;
         }
     }
 
@@ -144,6 +174,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             return ImmutableList.<JoinSet>builder()
                     .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee", false))
                     .addAll(findJoinSetsInDirectory(coffeeDir, ".litcoffee", true))
+                    .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee.md", true))
                     .build();
 
         }
@@ -163,7 +194,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         private StaticJoinSet(File file, boolean literate) {
             this.file = file;
             String name = file.getPath().substring(file.getParent().length() + 1);
-            setId(name.substring(0, name.lastIndexOf(".")));
+            name = name.substring(0, name.lastIndexOf("."));
+            if (name.endsWith("coffee")) {
+                name = name.substring(0, name.lastIndexOf("."));
+            }
+            setId(name);
             setLiterate(literate);
         }
 
@@ -193,7 +228,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         return coffeeFiles;
     }
 
-    private void write(final File joinSetOutputDirectory, final String fileName, final String contents) throws IOException {
+    private void write(final File joinSetOutputDirectory, final String fileName, final CompileResult contents) throws IOException {
         //Create the new Javascript file path
         File outputDirectory = coffeeOutputDirectory;
         if (joinSetOutputDirectory != null) {
@@ -204,7 +239,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             jsFile.getParentFile().mkdirs();
         }
 
-        Files.write(contents, jsFile, Charsets.UTF_8);
+        Files.write(contents.getJs(), jsFile, Charsets.UTF_8);
+        if (contents.getMap() != null) {
+            File mapFile = new File(outputDirectory, fileName + ".js.map");
+            Files.write(contents.getMap(), mapFile, Charsets.UTF_8);
+        }
     }
 
 }
