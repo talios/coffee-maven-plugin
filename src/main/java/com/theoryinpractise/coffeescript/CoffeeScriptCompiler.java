@@ -83,7 +83,7 @@ public class CoffeeScriptCompiler {
                     } catch (Exception e) {
                         sourceMap = null;
                     }
-                    
+
                     return new CompileResult(js, sourceMap);
                 }
 
