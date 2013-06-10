@@ -103,6 +103,13 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      */
     private List<JoinSet> coffeeJoinSets;
 
+    /**
+     * The Sub Directory is preserved.
+     * 
+     * @parameter default-value="false"
+     */
+    private Boolean preserveSubDirectory;
+
     @VisibleForTesting
     List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1");
 
@@ -183,7 +190,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private List<JoinSet> findJoinSetsInDirectory(final File coffeeDir, final String suffix, final boolean literate) {
         return Lists.transform(findCoffeeFilesInDirectory(coffeeDir, suffix), new Function<File, JoinSet>() {
             public JoinSet apply(@Nullable File file) {
-                return new StaticJoinSet(file, literate);
+                if(preserveSubDirectory) {
+                    return new StaticJoinSet(coffeeDir, file, literate);    
+                }else {
+                    return new StaticJoinSet(file.getParentFile(), file, literate);    
+                }
             }
         });
     }
@@ -191,13 +202,15 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private static class StaticJoinSet extends JoinSet {
         private File file;
 
-        private StaticJoinSet(File file, boolean literate) {
+        private StaticJoinSet(File parent, File file, boolean literate) {
             this.file = file;
-            String name = file.getPath().substring(file.getParent().length() + 1);
+            String name = file.getPath().substring(parent.getPath().length() + 1);
             name = name.substring(0, name.lastIndexOf("."));
             if (name.endsWith("coffee")) {
                 name = name.substring(0, name.lastIndexOf("."));
             }
+
+            name = name.replace(File.separatorChar, '/');
             setId(name);
             setLiterate(literate);
         }
