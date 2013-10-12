@@ -14,7 +14,7 @@ Add the main plugin elements:  groupId, artifactId, and version
     <plugin>
       <groupId>com.theoryinpractise</groupId>
       <artifactId>coffee-maven-plugin</artifactId>
-      <version>1.4.0</version>
+      <version>1.4.7</version>
     </plugin>
 
 Add the execution goal
@@ -37,7 +37,20 @@ Specify bare (see coffeescript compiler documentation)
     <bare>false</bare>
 
 It can be tough to debug compilation errors with the files joined together.  If you would like to compile the Files individually
+
     <compileIndividualFiles>true</compileIndividualFiles>
+
+If you wish to preserve the directory structure layout, so that compiled .js files follow their .coffee sources:
+
+    <preserveSubDirectory>true</preserveSubDirectory>
+    
+Source Maps can be activated using the following flag:
+    
+    <map>true</map>
+    
+If Source Maps are activated, the compiler will by default add the header pragma to the JavaScript-artifacts that is used by a debugger to find Source Maps. You can deactivated the header by using:
+
+    <header>false</header>
 
 Finally, add JoinSets.  The id of the joinSet will be the name of the resultant javascript file.
 
@@ -60,8 +73,8 @@ Finally, you can specify a directory of files to minify into one file,
     <directoryOfFilesToMinify></directoryOfFilesToMinify>
 
 or a fileset of files to minify into one file
-    <setOfFilesToMinify>
 
+    <setOfFilesToMinify>
     </setOfFilesToMinify>
 
 An Example Build Section:

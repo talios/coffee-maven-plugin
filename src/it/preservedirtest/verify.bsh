@@ -1,0 +1,11 @@
+import java.io.*;
+
+File file = new File( basedir, "target/coffee/com/theoryinpractise/cookbook.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file );
+}
+
+file = new File( basedir, "target/coffee/com/theoryinpractise/subdir/foo.coffee" );
+if ( file.isFile() ) {
+  throw new FileNotFoundException( "Found generated javascript file: " + file );
+}
