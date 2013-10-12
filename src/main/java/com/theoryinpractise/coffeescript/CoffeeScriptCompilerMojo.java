@@ -81,7 +81,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     /**
      * What version of Coffee-Script should we compile with?
      *
-     * @parameter default-value="1.6.1"
+     * @parameter default-value="1.6.3"
      */
     private String version;
 
@@ -111,7 +111,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private Boolean preserveSubDirectory;
 
     @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1");
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3");
+    List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.3");
 
     public void execute() throws MojoExecutionException {
 
@@ -119,8 +120,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to generate source maps when compiling joinsets individually");
         }
 
-        if (map && !version.equals("1.6.1")) {
-            throw new MojoExecutionException("CoffeeScript 1.6.1 is required for using source maps");
+        if (map && !sourceMapVersions.contains(version)) {
+            throw new MojoExecutionException("CoffeeScript 1.6.1 or newer is required for using source maps");
         }
 
         if (!acceptableVersions.contains(version)) {
