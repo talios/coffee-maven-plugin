@@ -8,10 +8,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
 import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
+import com.google.common.io.CharStreams;
+import org.dynjs.api.Scope;
+import org.dynjs.runtime.DynJS;
+import org.dynjs.runtime.DynJSConfig;
+import org.dynjs.runtime.DynThreadContext;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
+import java.io.InputStreamReader;
 
 /**
  * Copyright 2011 Mark Derricutt.
@@ -36,81 +39,50 @@ import java.util.Collections;
  */
 public class CoffeeScriptCompiler {
 
-    private final Scriptable globalScope;
     private String version;
-    private Scriptable coffeeScript;
+    private DynThreadContext compileContext;
+    private DynJS dynJs;
 
     public CoffeeScriptCompiler(String version) {
         this.version = version;
 
         try {
-            Context context = createContext();
-            globalScope = context.initStandardObjects();
-            final Require require = getSandboxedRequire(context, globalScope, true);
-            coffeeScript = require.requireMain(context, "coffee-script");
+            compileContext = new DynThreadContext();
+            DynJSConfig config = new DynJSConfig();
+            dynJs = new DynJS(config);
+            dynJs.eval(compileContext, CharStreams.toString(new InputStreamReader(CoffeeScriptCompiler.class.getResourceAsStream(String.format("/coffee-script-%s.js", version)))));
         } catch (Exception e1) {
-            throw new CoffeeScriptException("Unable to load the coffeeScript compiler into Rhino", e1);
-        } finally {
-            Context.exit();
+            throw new CoffeeScriptException("Unable to load the coffeeScript compiler", e1);
         }
 
     }
 
     public CompileResult compile(String coffeeScriptSource, String sourceName, boolean bare, SourceMap map, boolean header, boolean literate) {
-        Context context = Context.enter();
-        try {
-            Scriptable compileScope = context.newObject(coffeeScript);
-            compileScope.setParentScope(coffeeScript);
-            compileScope.put("coffeeScript", compileScope, coffeeScriptSource);
+
+        Scope scope = compileContext.getScope();
+        scope.define("coffeeScript", coffeeScriptSource);
+        boolean useMap = map != SourceMap.NONE;
+        String options = String.format("{bare: %s, sourceMap: %s, literate: %s, header: %s, filename: '%s'}", bare, useMap, literate, header, sourceName);
+
+        dynJs.eval(compileContext,
+                   String.format("val target = compile(coffeeScript, %s);", options),
+                   "source");
+
+        if (map == SourceMap.NONE) {
+            String result = (String) compileContext.getScope().resolve("target");
+            return new CompileResult(result, null);
+        } else {
+            String result = (String) compileContext.getScope().resolve("target.js");
+            String sourceMap;
             try {
-                boolean useMap = map != SourceMap.NONE;
-                String options = String.format("{bare: %s, sourceMap: %s, literate: %s, header: %s, filename: '%s'}", bare, useMap, literate, header, sourceName);
-                Object result = context.evaluateString(
-                        compileScope,
-                        String.format("compile(coffeeScript, %s);", options),
-                        sourceName, 0, null);
-
-                if (map == SourceMap.NONE) {
-                    return new CompileResult((String) result, null);
-                } else {
-
-                    NativeObject nativeObject = (NativeObject) result;
-                    String js = nativeObject.get("js").toString();
-                    String sourceMap;
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        sourceMap = objectMapper.writeValueAsString(nativeObject.get("v3SourceMap"));
-                    } catch (Exception e) {
-                        sourceMap = null;
-                    }
-
-                    return new CompileResult(js, sourceMap);
-                }
-
-            } catch (JavaScriptException e) {
-                throw new CoffeeScriptException(e.getMessage(), e);
+                ObjectMapper objectMapper = new ObjectMapper();
+                sourceMap = objectMapper.writeValueAsString(nativeObject.get(compileContext.getScope().resolve("target.v3SourceMap"));
+            } catch (Exception e) {
+                sourceMap = null;
             }
-        } finally {
-            Context.exit();
+            
+            return new CompileResult(js, sourceMap);
         }
-    }
-
-    private Context createContext() {
-        Context context = Context.enter();
-        context.setOptimizationLevel(9); // Enable optimization
-        return context;
-    }
-
-    private Require getSandboxedRequire(Context cx, Scriptable scope, boolean sandboxed) throws URISyntaxException {
-        return new Require(cx, cx.initStandardObjects(),
-                           new StrongCachingModuleScriptProvider(
-                                   new UrlModuleSourceProvider(Collections.singleton(
-                                           getDirectory()), null)), null, null, sandboxed);
-    }
-
-    private URI getDirectory() throws URISyntaxException {
-        final String resourcePath = String.format("/coffee-script-%s/", version);
-        return getClass().getResource(resourcePath).toURI();
     }
 
     public static enum SourceMap {NONE, V3}
