@@ -1,9 +1,11 @@
 package com.theoryinpractise.coffeescript;
 
+import com.google.common.io.CharStreams;
 import org.dynjs.runtime.DynJS;
 import org.dynjs.runtime.ExecutionContext;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Copyright 2011 Mark Derricutt.
@@ -40,7 +42,8 @@ public class CoffeeScriptCompiler {
             context = runtime.getExecutionContext();
             final String coffeeScriptTarget = String.format("/coffee-script-%s.js", version);
             final InputStream coffeeScriptStream = CoffeeScriptCompiler.class.getResourceAsStream(coffeeScriptTarget);
-            runtime.execute(this.context, coffeeScriptStream, coffeeScriptTarget);
+            final String source = CharStreams.toString(new InputStreamReader(coffeeScriptStream));
+            runtime.execute(source);
         } catch (Exception e1) {
             throw new CoffeeScriptException("Unable to load the coffeeScript compiler", e1);
         }
