@@ -37,13 +37,6 @@
 
     <repositories>
         <repository>
-            <id>repo</id>
-            <url>file://${basedir}/repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
             <id>projectodd-upstream</id>
             <name>project:odd Upstream Builds</name>
             <url>https://repository-projectodd.forge.cloudbees.com/upstream</url>
@@ -120,34 +113,11 @@
                             <include>args4j:args4j</include>
                             <include>org.mozilla:rhino</include>
                             <include>com.google.javascript:closure-compiler</include>
+                            <include>org.dynjs:dynjs</include>
                         </includes>
                     </artifactSet>
-                    <!--<relocations>-->
-                        <!--<relocation>-->
-                            <!--<pattern>org.mozilla.javascript</pattern>-->
-                            <!--<shadedPattern>com.theoryinpractise.coffeescript.javascript</shadedPattern>-->
-                            <!--<excludes>-->
-                                <!--&lt;!&ndash;<exclude>org.mozilla.javascript.Context</exclude>&ndash;&gt;-->
-                                <!--<exclude>org.mozilla.classfile.ByteCode</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ClassFileField</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ClassFileMethod</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ClassFileWriter</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ConstantPool</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.ExceptionTableEntry</exclude>-->
-                                <!--<exclude>org.mozilla.classfile.FieldOrMethodRef</exclude>-->
-                                <!--<exclude>org.mozilla.javascript.NativeFunction</exclude>-->
-                            <!--</excludes>-->
-                        <!--</relocation>-->
-                    <!--</relocations>-->
                 </configuration>
 
-                <!--<configuration>-->
-                <!--<artifactSet>-->
-                <!--<includes>-->
-                <!--<include>org.mozilla:rhino</include>-->
-                <!--</includes>-->
-                <!--</artifactSet>-->
-                <!--</configuration>-->
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -188,7 +158,7 @@
         <dependency>
             <groupId>org.dynjs</groupId>
             <artifactId>dynjs</artifactId>
-            <version>1.x.incremental.416</version>
+            <version>1.x.incremental.436</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
