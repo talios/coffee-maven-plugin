@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.theoryinpractise</groupId>
+    <artifactId>filesettest</artifactId>
+    <version>0.0.1</version>
+    <packaging>jar</packaging>
+
+    <name>filesettest</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.theoryinpractise</groupId>
+                <artifactId>coffee-maven-plugin</artifactId>
+                <version>@project.version@</version>
+
+                <executions>
+                    <execution>
+                        <id>coffee</id>
+                        <goals>
+                            <goal>coffee</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                	<minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
+                	<setOfFilesToMinify>
+                		<directory>${project.build.directory}/coffee</directory>
+                		<includes>
+                			<include>*.js</include>
+                		</includes>
+                	</setOfFilesToMinify>
+
+                	<coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
+                	<compileIndividualFiles>false</compileIndividualFiles>
+                    <coffeeJoinSets>
+                        <joinSet>
+                            <id>main</id>
+                            <orderedFiles>
+                                <file>${basedir}/src/main/coffee/com/theoryinpractise/orderedjointest/baseanimals.coffee</file>
+                                <file>${basedir}/src/main/coffee/com/theoryinpractise/orderedjointest/animals.coffee</file>
+                                <file>${basedir}/src/main/coffee/com/theoryinpractise/orderedjointest/usage.coffee</file>
+                            </orderedFiles>
+                        </joinSet>
+                    </coffeeJoinSets>
+                </configuration>
+
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.2.1</version>
+        </dependency>
+    </dependencies>
+
+</project>
