@@ -45,9 +45,9 @@ import java.util.List;
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3");
+    public static List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.2", "1.6.3");
 
-    List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.3");
+    public static List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.2", "1.6.3");
 
     /**
      * Default location of .coffee source files.
@@ -106,11 +106,6 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "false")
     private Boolean preserveSubDirectory;
-
-    @VisibleForTesting
-//    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3");
-    List<String> acceptableVersions = ImmutableList.of("1.6.3");
-    List<String> sourceMapVersions = ImmutableList.of("1.5.0", "1.6.1", "1.6.2", "1.6.3");
 
     public void execute() throws MojoExecutionException {
 

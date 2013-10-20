@@ -13,7 +13,7 @@ public class CoffeeScriptCompilerTest {
     @DataProvider
     public Iterator<Object[]> provideVersions() {
 
-        return Iterators.transform(new CoffeeScriptCompilerMojo().acceptableVersions.iterator(), new Function<String, Object[]>() {
+        return Iterators.transform(CoffeeScriptCompilerMojo.acceptableVersions.iterator(), new Function<String, Object[]>() {
             public Object[] apply(@Nullable String s) {
                 return new Object[] {s};
             }
@@ -29,7 +29,7 @@ public class CoffeeScriptCompilerTest {
     @Test(dataProvider = "provideVersions")
     public void testCompilation(final String version) {
         CoffeeScriptCompiler compiler = new CoffeeScriptCompiler(version);
-        CoffeeScriptCompiler.SourceMap sourceMap = "1.6.1".equals(version) ? CoffeeScriptCompiler.SourceMap.V3 : CoffeeScriptCompiler.SourceMap.NONE;
+        CoffeeScriptCompiler.SourceMap sourceMap = CoffeeScriptCompilerMojo.sourceMapVersions.contains(version) ? CoffeeScriptCompiler.SourceMap.V3 : CoffeeScriptCompiler.SourceMap.NONE;
         compiler.compile("string   = \"file3\"", "test", true, sourceMap, true, false);
     }
 
