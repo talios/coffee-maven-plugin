@@ -9,6 +9,10 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -36,9 +40,8 @@ import java.util.List;
  * <p/>
  * Compile CoffeeScript with Maven
  *
- * @goal coffee
- * @phase compile
  */
+@Mojo(name = "coffee", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     @VisibleForTesting
@@ -48,72 +51,66 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     /**
      * Default location of .coffee source files.
-     *
-     * @parameter expression="${basedir}/src/main/coffee"
-     * @required
      */
+    @Parameter(required = true, defaultValue = "${basedir}/src/main/coffee")
     private File coffeeDir;
 
     /**
      * Location of the output files from the Coffee Compiler.  Defaults to ${build.directory}/coffee
-     *
-     * @parameter expression="${project.build.directory}/coffee"
-     * @required
      */
+    @Parameter(required = true, defaultValue = "${project.build.directory}/coffee")
     private File coffeeOutputDirectory;
 
     /**
      * Should we compile as bare?  A compiler option for the Coffee Compiler.
-     *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private Boolean bare;
 
     /**
      * Should we generate source maps when compiling?
-     *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private Boolean map;
 
     /**
      * Should we generate source maps when compiling?
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private Boolean header;
 
     /**
      * What version of Coffee-Script should we compile with?
-     *
-     * @parameter default-value="1.6.3"
      */
+    @Parameter(defaultValue = "1.6.3")
     private String version;
 
     /**
      * Should the files be compiled individually or as a whole.
      * <p/>
      * This can help when trying to diagnose a compilation error
-     *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private Boolean compileIndividualFiles;
 
     /**
      * JoinSet definitions to join groups of coffee files into a single .js file
      * Individual Joinsets contain an id element to name the file that will be output and a maven
      * FileSet to define what files are included.
-     *
-     * @parameter
      */
+    @Parameter
     private List<JoinSet> coffeeJoinSets;
 
     /**
      * The Sub Directory is preserved.
-     *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private Boolean preserveSubDirectory;
+
+    @VisibleForTesting
+//    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3");
+    List<String> acceptableVersions = ImmutableList.of("1.6.3");
+    List<String> sourceMapVersions = ImmutableList.of("1.5.0", "1.6.1", "1.6.2", "1.6.3");
 
     public void execute() throws MojoExecutionException {
 

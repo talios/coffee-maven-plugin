@@ -1,5 +1,6 @@
 package com.theoryinpractise.coffeescript;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.CharStreams;
 import org.dynjs.runtime.DynJS;
 import org.dynjs.runtime.ExecutionContext;
@@ -39,11 +40,14 @@ public class CoffeeScriptCompiler {
 
         try {
             runtime = new DynJS();
+
             context = runtime.getExecutionContext();
             final String coffeeScriptTarget = String.format("/coffee-script-%s.js", version);
             final InputStream coffeeScriptStream = CoffeeScriptCompiler.class.getResourceAsStream(coffeeScriptTarget);
             final String source = CharStreams.toString(new InputStreamReader(coffeeScriptStream));
+
             runtime.execute(source);
+            context.getGlobalObject().addLoadPath(String.format("/coffee-script-%s')", version));
         } catch (Exception e1) {
             throw new CoffeeScriptException("Unable to load the coffeeScript compiler", e1);
         }
@@ -52,30 +56,32 @@ public class CoffeeScriptCompiler {
 
     public CompileResult compile(String coffeeScriptSource, String sourceName, boolean bare, SourceMap map, boolean header, boolean literate) {
 
-        Scope scope = compileContext.getScope();
-        scope.define("coffeeScript", coffeeScriptSource);
         boolean useMap = map != SourceMap.NONE;
         String options = String.format("{bare: %s, sourceMap: %s, literate: %s, header: %s, filename: '%s'}", bare, useMap, literate, header, sourceName);
 
-        dynJs.eval(compileContext,
-                   String.format("val target = compile(coffeeScript, %s);", options),
-                   "source");
+        context.getGlobalObject().put("coffeeScript", coffeeScriptSource);
+
+        runtime.evaluate(String.format("var target = CoffeeScript.compile(coffeeScript, %s);", options));
 
         if (map == SourceMap.NONE) {
-            String result = (String) compileContext.getScope().resolve("target");
+            String result = (String) value(context, "target");
             return new CompileResult(result, null);
         } else {
-            String result = (String) compileContext.getScope().resolve("target.js");
+            String js = (String) value(context, "target.js");
             String sourceMap;
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                sourceMap = objectMapper.writeValueAsString(nativeObject.get(compileContext.getScope().resolve("target.v3SourceMap"));
+                sourceMap = objectMapper.writeValueAsString(value(context, "target.v3SourceMap"));
             } catch (Exception e) {
                 sourceMap = null;
             }
-            
+
             return new CompileResult(js, sourceMap);
         }
+    }
+
+    private Object value(ExecutionContext context, String var) {
+        return context.resolve(var).getValue(context);
     }
 
     public static enum SourceMap {NONE, V3}
