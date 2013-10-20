@@ -41,6 +41,11 @@ import java.util.List;
  */
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
+    @VisibleForTesting
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3");
+
+    List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.3");
+
     /**
      * Default location of .coffee source files.
      *
@@ -105,14 +110,10 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     /**
      * The Sub Directory is preserved.
-     * 
+     *
      * @parameter default-value="false"
      */
     private Boolean preserveSubDirectory;
-
-    @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3");
-    List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.3");
 
     public void execute() throws MojoExecutionException {
 
@@ -127,8 +128,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         if (!acceptableVersions.contains(version)) {
 
             String error = String.format("Unsupported version of coffee-script specified (%s) - supported versions: %s",
-                                                version,
-                                                Joiner.on(", ").join(acceptableVersions));
+                                         version,
+                                         Joiner.on(", ").join(acceptableVersions));
 
             throw new MojoExecutionException(error);
         }
@@ -137,10 +138,12 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         CoffeeScriptCompiler coffeeScriptCompiler = new CoffeeScriptCompiler(version);
 
         try {
-            if (compileIndividualFiles) {
-                getLog().info("Starting individual compilations of files");
+            for (JoinSet joinSet : findJoinSets()) {
+                boolean compileJoinSetIndividually = joinSet.getCompileIndividualFiles() != null ? joinSet.getCompileIndividualFiles() : compileIndividualFiles;
 
-                for (JoinSet joinSet : findJoinSets()) {
+                if (compileJoinSetIndividually) {
+                    getLog().info("Starting individual compilations of files");
+
                     StringBuilder compiled = new StringBuilder();
                     for (File file : joinSet.getFiles()) {
                         getLog().info("Compiling File " + file.getName() + " in JoinSet:" + joinSet.getId());
@@ -149,15 +152,14 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
                                 .append("\n");
                     }
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), new CompileResult(compiled.toString(), null));
-                }
-            } else {
-                for (JoinSet joinSet : findJoinSets()) {
+                } else {
                     getLog().info("Compiling JoinSet: " + joinSet.getId() + " with files:  " + joinSet.getFileNames());
 
                     String sourceName = joinSet.getId() + (joinSet.isLiterate() ? ".litcoffee" : ".coffee");
                     CompileResult compiled = coffeeScriptCompiler.compile(joinSet.getConcatenatedStringOfFiles(), sourceName, bare, getSourceMapType(), header, joinSet.isLiterate());
 
                     write(joinSet.getCoffeeOutputDirectory(), joinSet.getId(), compiled);
+
                 }
             }
 
@@ -180,10 +182,10 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         } else {
             // Generate a joinset for each .coffee file
             return ImmutableList.<JoinSet>builder()
-                    .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee", false))
-                    .addAll(findJoinSetsInDirectory(coffeeDir, ".litcoffee", true))
-                    .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee.md", true))
-                    .build();
+                                .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee", false))
+                                .addAll(findJoinSetsInDirectory(coffeeDir, ".litcoffee", true))
+                                .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee.md", true))
+                                .build();
 
         }
     }
@@ -191,37 +193,14 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     private List<JoinSet> findJoinSetsInDirectory(final File coffeeDir, final String suffix, final boolean literate) {
         return Lists.transform(findCoffeeFilesInDirectory(coffeeDir, suffix), new Function<File, JoinSet>() {
             public JoinSet apply(@Nullable File file) {
-                if(preserveSubDirectory) {
-                    return new StaticJoinSet(coffeeDir, file, literate);    
-                }else {
-                    return new StaticJoinSet(file.getParentFile(), file, literate);    
+                if (preserveSubDirectory) {
+                    return new StaticJoinSet(coffeeDir, file, literate);
+                } else {
+                    return new StaticJoinSet(file.getParentFile(), file, literate);
                 }
             }
         });
     }
-
-    private static class StaticJoinSet extends JoinSet {
-        private File file;
-
-        private StaticJoinSet(File parent, File file, boolean literate) {
-            this.file = file;
-            String name = file.getPath().substring(parent.getPath().length() + 1);
-            name = name.substring(0, name.lastIndexOf("."));
-            if (name.endsWith("coffee")) {
-                name = name.substring(0, name.lastIndexOf("."));
-            }
-
-            name = name.replace(File.separatorChar, '/');
-            setId(name);
-            setLiterate(literate);
-        }
-
-        @Override
-        public List<File> getFiles() throws IOException {
-            return ImmutableList.of(file);
-        }
-    }
-
 
     private List<File> findCoffeeFilesInDirectory(File coffeeDir, final String suffix) {
 
@@ -257,6 +236,28 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         if (contents.getMap() != null) {
             File mapFile = new File(outputDirectory, fileName + ".js.map");
             Files.write(contents.getMap(), mapFile, Charsets.UTF_8);
+        }
+    }
+
+    private static class StaticJoinSet extends JoinSet {
+        private File file;
+
+        private StaticJoinSet(File parent, File file, boolean literate) {
+            this.file = file;
+            String name = file.getPath().substring(parent.getPath().length() + 1);
+            name = name.substring(0, name.lastIndexOf("."));
+            if (name.endsWith("coffee")) {
+                name = name.substring(0, name.lastIndexOf("."));
+            }
+
+            name = name.replace(File.separatorChar, '/');
+            setId(name);
+            setLiterate(literate);
+        }
+
+        @Override
+        public List<File> getFiles() throws IOException {
+            return ImmutableList.of(file);
         }
     }
 

@@ -40,14 +40,13 @@
                 	</setOfFilesToMinify>
 
                 	<coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
-                	<compileIndividualFiles>false</compileIndividualFiles>
+                	<compileIndividualFiles>true</compileIndividualFiles>
                     <coffeeJoinSets>
                         <joinSet>
                             <id>main</id>
                             <orderedFiles>
                                 <file>${basedir}/src/main/coffee/com/theoryinpractise/orderedjointest/baseanimals.coffee</file>
                                 <file>${basedir}/src/main/coffee/com/theoryinpractise/orderedjointest/animals.coffee</file>
-                                <file>${basedir}/src/main/coffee/com/theoryinpractise/orderedjointest/usage.coffee</file>
                             </orderedFiles>
                         </joinSet>
                     </coffeeJoinSets>
