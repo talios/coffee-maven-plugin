@@ -1,20 +1,9 @@
 package com.theoryinpractise.coffeescript;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.commonjs.module.Require;
-import org.mozilla.javascript.commonjs.module.provider.StrongCachingModuleScriptProvider;
-import org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider;
-import com.google.common.io.CharStreams;
-import org.dynjs.api.Scope;
 import org.dynjs.runtime.DynJS;
-import org.dynjs.runtime.DynJSConfig;
-import org.dynjs.runtime.DynThreadContext;
+import org.dynjs.runtime.ExecutionContext;
 
-import java.io.InputStreamReader;
+import java.io.InputStream;
 
 /**
  * Copyright 2011 Mark Derricutt.
@@ -40,17 +29,18 @@ import java.io.InputStreamReader;
 public class CoffeeScriptCompiler {
 
     private String version;
-    private DynThreadContext compileContext;
-    private DynJS dynJs;
+    private DynJS runtime;
+    private final ExecutionContext context;
 
     public CoffeeScriptCompiler(String version) {
         this.version = version;
 
         try {
-            compileContext = new DynThreadContext();
-            DynJSConfig config = new DynJSConfig();
-            dynJs = new DynJS(config);
-            dynJs.eval(compileContext, CharStreams.toString(new InputStreamReader(CoffeeScriptCompiler.class.getResourceAsStream(String.format("/coffee-script-%s.js", version)))));
+            runtime = new DynJS();
+            context = runtime.getExecutionContext();
+            final String coffeeScriptTarget = String.format("/coffee-script-%s.js", version);
+            final InputStream coffeeScriptStream = CoffeeScriptCompiler.class.getResourceAsStream(coffeeScriptTarget);
+            runtime.execute(this.context, coffeeScriptStream, coffeeScriptTarget);
         } catch (Exception e1) {
             throw new CoffeeScriptException("Unable to load the coffeeScript compiler", e1);
         }
