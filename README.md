@@ -58,10 +58,19 @@ Finally, add JoinSets.  The id of the joinSet will be the name of the resultant 
       <joinSet>
         <id>main</id>
         <coffeeOutputDirectory>${project.build.directory}/other-directory</coffeeOutputDirectory>
+        <compileIndividualFiles/>
+        <orderedFiles/>
         <fileSet>
         </fileSet>
       </joinSet>
     </coffeeJoinSets>
+
+If a defined joinset is to contain order dependant source files, they can be listed in the `<orderedFiles/>`'s element and
+they will be included at the start of the resulting fileset .js file in the order they're mentioned. Ordered files will also be excluded
+from the provided fileset.
+
+When ordered files are included in a joinset, it's `<compileIndividualFiles/>` field is set to `false`, overriding any global setting
+of the plugin configuration.
 
 The output directory for an individual joinsets can also be overridden by setting <coffeeOutputDirectory/> inside
 the <joinSet/> element.

@@ -10,6 +10,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class JoinSet {
 
     private boolean literate = false;
 
+    private Boolean compileIndividualFiles;
     /**
      * Location of the output files from the Coffee Compiler. Defaults to the value for coffeeOutputDirectory specified
      * in the main configuration if it is not specified within this JoinSet.
@@ -50,6 +52,8 @@ public class JoinSet {
 
     private FileSet fileSet;
 
+    private List<File> orderedFiles = new ArrayList<File>();
+
     /**
      * A cache of the list of files in the fileSet
      */
@@ -59,6 +63,14 @@ public class JoinSet {
      * A cache of the concatenated contents of the files in the fileset
      */
     private String concatenatedStringOfFiles;
+
+    public Boolean getCompileIndividualFiles() {
+        return compileIndividualFiles;
+    }
+
+    public void setCompileIndividualFiles(Boolean compileIndividualFiles) {
+        this.compileIndividualFiles = compileIndividualFiles;
+    }
 
     public String getId() {
         return id;
@@ -98,7 +110,14 @@ public class JoinSet {
      */
     public List<File> getFiles() throws IOException {
     	if(null==files){
-	    	files = FileUtilities.getFilesFromFileSet(getFileSet());
+            files = new ArrayList<File>();
+            files.addAll(orderedFiles);
+            FileSet set = getFileSet();
+            if (set != null) {
+                List<File> fileSetFiles = FileUtilities.getFilesFromFileSet(set);
+                fileSetFiles.removeAll(orderedFiles);
+	    	    files.addAll(fileSetFiles);
+            }
 	    }
     	return files;
     }
@@ -147,4 +166,15 @@ public class JoinSet {
 		this.fileSet = fileSet;
 
 	}
+
+    public List<File> getOrderedFiles() {
+        return orderedFiles;
+    }
+
+    public void setOrderedFiles(List<File> orderedFiles) {
+        files = null;
+        concatenatedStringOfFiles = null;
+        compileIndividualFiles = false;
+        this.orderedFiles = orderedFiles;
+    }
 }
