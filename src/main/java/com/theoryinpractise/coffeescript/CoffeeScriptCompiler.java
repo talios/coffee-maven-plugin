@@ -46,8 +46,7 @@ public class CoffeeScriptCompiler {
             final InputStream coffeeScriptStream = CoffeeScriptCompiler.class.getResourceAsStream(coffeeScriptTarget);
             final String source = CharStreams.toString(new InputStreamReader(coffeeScriptStream));
 
-            runtime.execute(source);
-            context.getGlobalObject().addLoadPath(String.format("/coffee-script-%s')", version));
+            runtime.execute(source);            
         } catch (Exception e1) {
             throw new CoffeeScriptException("Unable to load the coffeeScript compiler", e1);
         }
@@ -67,11 +66,11 @@ public class CoffeeScriptCompiler {
             String result = (String) value(context, "target");
             return new CompileResult(result, null);
         } else {
-            String js = (String) value(context, "target.js");
+            String js = (String) runtime.evaluate("target.js");
             String sourceMap;
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                sourceMap = objectMapper.writeValueAsString(value(context, "target.v3SourceMap"));
+                sourceMap = objectMapper.writeValueAsString(runtime.evaluate("target.v3SourceMap"));
             } catch (Exception e) {
                 sourceMap = null;
             }
