@@ -112,26 +112,22 @@ public class ClosureMinifier {
 	 * and pulls the default Externs there.  This class could be modified to instead look
 	 * somewhere more relevant to the project.
 	 */
-	private JSSourceFile[] getExterns(){
-
-		List<JSSourceFile> externs = Lists.newArrayList();
+	private List<SourceFile> getExterns(){
 		try {
-			externs = CommandLineRunner.getDefaultExterns();
-
+			return CommandLineRunner.getDefaultExterns();
 		} catch (IOException e) {
 			throw new ClosureException("Unable to load default External variables Files. The files include definitions for global javascript/browser objects such as window, document.", e);
 		}
-		return externs.toArray(new JSSourceFile[externs.size()]);
 	}
 
-	private JSSourceFile[] getInputs(List<File> filesToProcess){
-		List<JSSourceFile> files = Lists.newArrayList();
+	private List<SourceFile> getInputs(List<File> filesToProcess)   {
+		List<SourceFile> files = Lists.newArrayList();
 
 		for(File file : filesToProcess){
-			files.add(JSSourceFile.fromFile(file));
+			files.add(SourceFile.fromFile(file));
 		}
 
-		return files.toArray(new JSSourceFile[files.size()]);
+		return files;
 	}
 
 	public String getCompilationLevel() {

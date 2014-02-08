@@ -1,0 +1,18 @@
+import java.io.*;
+
+File file = new File( basedir, "target/coffee/directorysets-0.0.1.min.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Could not find generated joinset javascript file: " + file );
+}
+
+file = new File( basedir, "target/coffee/com/theoryinpractise/coffee/cookbook.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Found generated javascript file: " + file );
+}
+
+file = new File( basedir, "target/coffee/com/theoryinpractise/morecoffee/foo.js" );
+if ( !file.isFile() ) {
+  throw new FileNotFoundException( "Found generated javascript file: " + file );
+}
+
+
