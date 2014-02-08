@@ -9,6 +9,10 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -16,7 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Copyright 2011 Mark Derricutt.
+ * Copyright 2011-2014Mark Derricutt.
  * <p/>
  * Contributing authors:
  * Daniel Bower
@@ -36,9 +40,8 @@ import java.util.List;
  * <p/>
  * Compile CoffeeScript with Maven
  *
- * @goal coffee
- * @phase compile
  */
+@Mojo(name = "coffee", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     @VisibleForTesting
@@ -48,46 +51,50 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     /**
      * Default location of .coffee source files.
-     *
-     * @parameter expression="${basedir}/src/main/coffee"
-     * @required
      */
+    @Parameter(required = true, property = "coffeeDir", defaultValue = "${basedir}/src/main/coffee")
     private File coffeeDir;
+
+    /**
+     * Extra directory locations of .coffee source files.
+     *
+     */
+    @Parameter
+    private List<File> refills;
 
     /**
      * Location of the output files from the Coffee Compiler.  Defaults to ${build.directory}/coffee
      *
-     * @parameter expression="${project.build.directory}/coffee"
-     * @required
      */
+    @Parameter(required = true, property = "coffeeOutputDirectory", defaultValue = "${project.build.directory}/coffee")
     private File coffeeOutputDirectory;
 
     /**
      * Should we compile as bare?  A compiler option for the Coffee Compiler.
      *
-     * @parameter default-value="false"
      */
+    @Parameter(property = "bare", defaultValue = "false")
     private Boolean bare;
 
     /**
      * Should we generate source maps when compiling?
      *
-     * @parameter default-value="false"
      */
+    @Parameter(property = "map", defaultValue = "false")
     private Boolean map;
 
     /**
      * Should we generate source maps when compiling?
      *
-     * @parameter default-value="true"
      */
+    @Parameter(property = "header", defaultValue = "true")
     private Boolean header;
 
     /**
      * What version of Coffee-Script should we compile with?
      *
-     * @parameter default-value="1.7.1"
      */
+    @Parameter(defaultValue = "1.7.1")
     private String version;
 
     /**
@@ -95,8 +102,8 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      * <p/>
      * This can help when trying to diagnose a compilation error
      *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private Boolean compileIndividualFiles;
 
     /**
@@ -104,15 +111,15 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      * Individual Joinsets contain an id element to name the file that will be output and a maven
      * FileSet to define what files are included.
      *
-     * @parameter
      */
+    @Parameter
     private List<JoinSet> coffeeJoinSets;
 
     /**
      * The Sub Directory is preserved.
      *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private Boolean preserveSubDirectory;
 
     public void execute() throws MojoExecutionException {
@@ -181,16 +188,25 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
             return coffeeJoinSets;
         } else {
             // Generate a joinset for each .coffee file
-            return ImmutableList.<JoinSet>builder()
-                                .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee", false))
-                                .addAll(findJoinSetsInDirectory(coffeeDir, ".litcoffee", true))
-                                .addAll(findJoinSetsInDirectory(coffeeDir, ".coffee.md", true))
-                                .build();
+            List<File> coffeeDirectories = Lists.newArrayList(coffeeDir);
+            if (refills != null && !refills.isEmpty()) {
+              coffeeDirectories.addAll(refills);
+            }
+
+            final ImmutableList.Builder<JoinSet> builder = ImmutableList.builder();
+
+            for (File directory : coffeeDirectories) {
+                builder.addAll(findJoinSetsInDirectory(directory, ".coffee", false))
+                       .addAll(findJoinSetsInDirectory(directory, ".litcoffee", true))
+                       .addAll(findJoinSetsInDirectory(directory, ".coffee.md", true));
+            }
+
+            return builder.build();
 
         }
     }
 
-    private List<JoinSet> findJoinSetsInDirectory(final File coffeeDir, final String suffix, final boolean literate) {
+  private List<JoinSet> findJoinSetsInDirectory(final File coffeeDir, final String suffix, final boolean literate) {
         return Lists.transform(findCoffeeFilesInDirectory(coffeeDir, suffix), new Function<File, JoinSet>() {
             public JoinSet apply(@Nullable File file) {
                 if (preserveSubDirectory) {
