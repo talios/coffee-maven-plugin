@@ -45,9 +45,9 @@ import java.util.List;
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     @VisibleForTesting
-    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3", "1.7.1");
+    List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0", "1.6.1", "1.6.3", "1.7.1", "1.8.0");
 
-    List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.3", "1.7.1");
+    List<String> sourceMapVersions = ImmutableList.of("1.6.1", "1.6.3", "1.7.1", "1.8.0");
 
     /**
      * Default location of .coffee source files.
@@ -94,7 +94,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
      * What version of Coffee-Script should we compile with?
      *
      */
-    @Parameter(defaultValue = "1.7.1")
+    @Parameter(defaultValue = "1.8.0")
     private String version;
 
     /**
