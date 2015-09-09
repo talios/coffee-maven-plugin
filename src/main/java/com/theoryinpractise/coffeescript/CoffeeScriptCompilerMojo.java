@@ -246,6 +246,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
         File jsFile = new File(outputDirectory, fileName + ".js");
         if (!jsFile.getParentFile().exists()) {
+            getLog().info("Creating output path: " + jsFile.getParentFile().getPath());
             jsFile.getParentFile().mkdirs();
         }
 
