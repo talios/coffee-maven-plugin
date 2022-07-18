@@ -2,7 +2,6 @@ package com.theoryinpractise.coffeescript;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -14,10 +13,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Copyright 2011-2014Mark Derricutt.
@@ -123,6 +123,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private Boolean preserveSubDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException {
 
         if (compileIndividualFiles && map) {
@@ -208,15 +209,13 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     }
 
   private List<JoinSet> findJoinSetsInDirectory(final File coffeeDir, final String suffix, final boolean literate) {
-        return Lists.transform(findCoffeeFilesInDirectory(coffeeDir, suffix), new Function<File, JoinSet>() {
-            public JoinSet apply(@Nullable File file) {
-                if (preserveSubDirectory) {
-                    return new StaticJoinSet(coffeeDir, file, literate);
-                } else {
-                    return new StaticJoinSet(file.getParentFile(), file, literate);
-                }
+        return findCoffeeFilesInDirectory(coffeeDir, suffix).stream().map(file -> {
+            if (preserveSubDirectory) {
+                return new StaticJoinSet(coffeeDir, file, literate);
+            } else {
+                return new StaticJoinSet(file.getParentFile(), file, literate);
             }
-        });
+        }).collect(toList());
     }
 
     private List<File> findCoffeeFilesInDirectory(File coffeeDir, final String suffix) {
@@ -258,7 +257,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
     }
 
     private static class StaticJoinSet extends JoinSet {
-        private File file;
+        private final File file;
 
         private StaticJoinSet(File parent, File file, boolean literate) {
             this.file = file;
@@ -274,7 +273,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
 
         @Override
-        public List<File> getFiles() throws IOException {
+        public List<File> getFiles() {
             return ImmutableList.of(file);
         }
     }

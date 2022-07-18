@@ -14,7 +14,7 @@ Add the main plugin elements:  groupId, artifactId, and version
     <plugin>
       <groupId>com.theoryinpractise</groupId>
       <artifactId>coffee-maven-plugin</artifactId>
-      <version>1.4.7</version>
+      <version>1.4.17</version>
     </plugin>
 
 Add the execution goal
@@ -93,7 +93,7 @@ An Example Build Section:
         <plugin>
           <groupId>com.theoryinpractise</groupId>
           <artifactId>coffee-maven-plugin</artifactId>
-          <version>1.3.1</version>
+          <version>1.4.17</version>
 
           <configuration>
              <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
