@@ -53,6 +53,7 @@ public class JavaScriptMinifierMojo extends AbstractMojo {
   @Parameter
   private FileSet setOfFilesToMinify;
 
+  @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
       getLog().info("Minifying all Javascript Files in the Output Directory");

@@ -3,13 +3,12 @@ package com.theoryinpractise.coffeescript;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,8 +141,8 @@ public class JoinSet {
                     throw new IOException(String.format("JoinSet %s references missing file: %s", getId(), file.getPath()));
                 }
 
-                InputSupplier<InputStreamReader> readerSupplier = Files.newReaderSupplier(file, Charsets.UTF_8);
-                sb.append(CharStreams.toString(readerSupplier));
+                BufferedReader reader = Files.newReader(file, Charsets.UTF_8);
+                sb.append(CharStreams.toString(reader));
                 sb.append("\n");
             }
 

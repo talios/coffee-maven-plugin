@@ -52,10 +52,11 @@ public class ClosureMinifier {
 	public void compile(List<File> filesToCompile, String destFileName){
 		File destFile = prepareDestFile(destFileName);
 
+		logger.info("Creating compiler and compiling...");
 		Compiler compiler = new Compiler();
 		Result results = compiler.compile(getExterns(), getInputs(filesToCompile), getCompilerOptions());
+		logger.info("Compiled...");
 
-		logger.debug(results.debugLog);
 		for(JSError error : results.errors){
 			logger.error("Closure Minifier Error:  " + error.sourceName + "  Description:  " +  error.description);
 		}
