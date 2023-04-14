@@ -52,6 +52,10 @@ If Source Maps are activated, the compiler will by default add the header pragma
 
     <header>false</header>
 
+You can specify a CoffeeScript version in a configuration
+
+    <version>1.9.3</version>
+
 Finally, add JoinSets.  The id of the joinSet will be the name of the resultant javascript file.
 
     <coffeeJoinSets>
@@ -107,7 +111,7 @@ An Example Build Section:
              	</excludes>
              </setOfFilesToMinify>
 
-             <version>1.1.3</version>
+             <version>1.9.3</version>
              <coffeeOutputDirectory>${project.build.directory}/coffee</coffeeOutputDirectory>
              <compileIndividualFiles>true</compileIndividualFiles>
              <coffeeJoinSets>
