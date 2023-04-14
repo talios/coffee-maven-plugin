@@ -3,7 +3,7 @@
     <groupId>com.theoryinpractise</groupId>
     <artifactId>coffee-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.4.18-SNAPSHOT</version>
+    <version>1.4.19-SNAPSHOT</version>
     <name>Coffeescript Maven Plugin</name>
     <description>A Maven 2.0 plugin for compiling coffeescript into javascript</description>
     <url>https://github.com/talios/coffee-maven-plugin</url>
@@ -237,7 +237,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20220924</version>
+            <version>20230227</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
