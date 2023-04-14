@@ -14,7 +14,7 @@ Add the main plugin elements:  groupId, artifactId, and version
     <plugin>
       <groupId>com.theoryinpractise</groupId>
       <artifactId>coffee-maven-plugin</artifactId>
-      <version>1.4.17</version>
+      <version>1.4.18</version>
     </plugin>
 
 Add the execution goal
@@ -43,11 +43,11 @@ It can be tough to debug compilation errors with the files joined together.  If 
 If you wish to preserve the directory structure layout, so that compiled .js files follow their .coffee sources:
 
     <preserveSubDirectory>true</preserveSubDirectory>
-    
+
 Source Maps can be activated using the following flag:
-    
+
     <map>true</map>
-    
+
 If Source Maps are activated, the compiler will by default add the header pragma to the JavaScript-artifacts that is used by a debugger to find Source Maps. You can deactivated the header by using:
 
     <header>false</header>
@@ -97,7 +97,7 @@ An Example Build Section:
         <plugin>
           <groupId>com.theoryinpractise</groupId>
           <artifactId>coffee-maven-plugin</artifactId>
-          <version>1.4.17</version>
+          <version>1.4.18</version>
 
           <configuration>
              <minifiedFile>${project.build.directory}/coffee/${project.artifactId}-${project.version}.min.js</minifiedFile>
