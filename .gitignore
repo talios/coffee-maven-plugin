@@ -8,3 +8,6 @@ dependency-reduced-pom.xml
 .settings
 .flattened-pom.xml
 .inlined-pom.xml
+.inlined-pom.xml
+.flattened-pom.xml
+dependency-reduced-pom.xml
