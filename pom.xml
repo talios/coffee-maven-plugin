@@ -8,6 +8,12 @@
     <description>A Maven 2.0 plugin for compiling coffeescript into javascript</description>
     <url>https://github.com/talios/coffee-maven-plugin</url>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+        <graaljs.version>24.2.2</graaljs.version>
+    </properties>
+
     <scm>
         <developerConnection>scm:git:git@github.com:talios/coffee-maven-plugin.git</developerConnection>
         <url>http://github.com/talios/coffee-maven-plugin</url>
@@ -85,8 +91,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -97,7 +102,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.6.4</version>
+                <version>3.15.1</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
@@ -122,42 +127,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
+                <version>3.6.0</version>
                 <configuration>
                     <artifactSet>
                         <includes>
                             <include>args4j:args4j</include>
-                            <include>com.github.tntim96:rhino</include>
                             <include>com.google.javascript:closure-compiler</include>
                             <include>org.json:json</include>
                         </includes>
                     </artifactSet>
-                    <!--<relocations>-->
-                    <!--<relocation>-->
-                    <!--<pattern>org.mozilla.javascript</pattern>-->
-                    <!--<shadedPattern>com.theoryinpractise.coffeescript.javascript</shadedPattern>-->
-                    <!--<excludes>-->
-                    <!--&lt;!&ndash;<exclude>org.mozilla.javascript.Context</exclude>&ndash;&gt;-->
-                    <!--<exclude>org.mozilla.classfile.ByteCode</exclude>-->
-                    <!--<exclude>org.mozilla.classfile.ClassFileField</exclude>-->
-                    <!--<exclude>org.mozilla.classfile.ClassFileMethod</exclude>-->
-                    <!--<exclude>org.mozilla.classfile.ClassFileWriter</exclude>-->
-                    <!--<exclude>org.mozilla.classfile.ConstantPool</exclude>-->
-                    <!--<exclude>org.mozilla.classfile.ExceptionTableEntry</exclude>-->
-                    <!--<exclude>org.mozilla.classfile.FieldOrMethodRef</exclude>-->
-                    <!--<exclude>org.mozilla.javascript.NativeFunction</exclude>-->
-                    <!--</excludes>-->
-                    <!--</relocation>-->
-                    <!--</relocations>-->
                 </configuration>
 
-                <!--<configuration>-->
-                <!--<artifactSet>-->
-                <!--<includes>-->
-                <!--<include>org.mozilla:rhino</include>-->
-                <!--</includes>-->
-                <!--</artifactSet>-->
-                <!--</configuration>-->
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -219,9 +199,27 @@
             <version>3.9.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.tntim96</groupId>
-            <artifactId>rhino</artifactId>
-            <version>1.7R5pre05</version>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>polyglot</artifactId>
+            <version>${graaljs.version}</version>
+        </dependency>
+        <!--
+            The org.graalvm.polyglot:js-community aggregator is a pom, and maven-shade-plugin
+            drops pom-typed dependencies from the dependency-reduced-pom, which would leave
+            consumers of this plugin without a JavaScript language on the classpath.  Depend on
+            the two jars it aggregates instead.
+        -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-language</artifactId>
+            <version>${graaljs.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-runtime</artifactId>
+            <version>${graaljs.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
@@ -244,6 +242,12 @@
             <artifactId>commons-io</artifactId>
             <version>2.13.0</version>
         </dependency>
+        <!-- FileUtilities uses plexus FileUtils; maven core no longer exports it to plugin realms -->
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.5.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
@@ -265,16 +269,6 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>7.12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
         </dependency>
 
     </dependencies>

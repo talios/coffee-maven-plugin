@@ -62,6 +62,25 @@
             <artifactId>testng</artifactId>
             <version>6.2.1</version>
         </dependency>
+        <!-- the JDK no longer ships a JavaScript engine, so bring GraalJS along for the test -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>@graaljs.version@</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-language</artifactId>
+            <version>@graaljs.version@</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-runtime</artifactId>
+            <version>@graaljs.version@</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
