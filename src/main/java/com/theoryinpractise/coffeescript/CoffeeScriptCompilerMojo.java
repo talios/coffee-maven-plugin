@@ -19,30 +19,34 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-/**
+/*
  * Copyright 2011-2014Mark Derricutt.
- * <p/>
+ * <p>
  * Contributing authors:
  * Daniel Bower
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * <p/>
- * <p/>
+ */
+
+/**
  * Compile CoffeeScript with Maven
- *
  */
 @Mojo(name = "coffee", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class CoffeeScriptCompilerMojo extends AbstractMojo {
+
+    /** Creates the mojo, instantiated by maven. */
+    public CoffeeScriptCompilerMojo() {
+    }
 
     @VisibleForTesting
     List<String> acceptableVersions = ImmutableList.of("1.2.0", "1.3.1", "1.3.3", "1.4.0", "1.5.0",
@@ -100,7 +104,7 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
 
     /**
      * Should the files be compiled individually or as a whole.
-     * <p/>
+     * <p>
      * This can help when trying to diagnose a compilation error
      *
      */
@@ -177,6 +181,11 @@ public class CoffeeScriptCompilerMojo extends AbstractMojo {
         }
     }
 
+    /**
+     * The kind of source map this execution should generate.
+     *
+     * @return the kind of source map to generate, based on the {@code map} parameter
+     */
     public CoffeeScriptCompiler.SourceMap getSourceMapType() {
         if (map) {
             return CoffeeScriptCompiler.SourceMap.V3;

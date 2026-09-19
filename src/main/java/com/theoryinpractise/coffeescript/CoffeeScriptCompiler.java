@@ -15,25 +15,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/*
  * Copyright 2011 Mark Derricutt.
- * <p/>
+ * <p>
  * Contributing authors:
  * Daniel Bower
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * <p/>
- * <p/>
+ */
+
+/**
  * Wrapper around the coffee-script compiler from https://github.com/jashkenas/coffee-script/
  */
 public class CoffeeScriptCompiler implements AutoCloseable {
@@ -64,6 +65,11 @@ public class CoffeeScriptCompiler implements AutoCloseable {
 
     private final Value coffeeScript;
 
+    /**
+     * Loads the bundled coffee-script compiler of the given version into a GraalJS context.
+     *
+     * @param version the coffee-script version to load, as bundled in {@code coffee-script/<version>}
+     */
     public CoffeeScriptCompiler(String version) {
         this.version = version;
 
@@ -82,6 +88,17 @@ public class CoffeeScriptCompiler implements AutoCloseable {
         }
     }
 
+    /**
+     * Compile a CoffeeScript source to javascript.
+     *
+     * @param coffeeScriptSource the CoffeeScript source to compile
+     * @param sourceName the file name reported in errors and source maps
+     * @param bare {@code true} to omit the top level function safety wrapper
+     * @param map the kind of source map to generate
+     * @param header {@code true} to prefix the output with a generated-by header
+     * @param literate {@code true} if the source is literate CoffeeScript
+     * @return the compiled javascript, and the source map when one was requested
+     */
     public CompileResult compile(String coffeeScriptSource, String sourceName, boolean bare, SourceMap map, boolean header, boolean literate) {
         try {
             boolean useMap = map != SourceMap.NONE;
@@ -203,10 +220,17 @@ public class CoffeeScriptCompiler implements AutoCloseable {
         }
     }
 
+    /** Closes the underlying GraalJS context. */
     public void close() {
         context.close();
     }
 
-    public static enum SourceMap {NONE, V3}
+    /** The kinds of source map the compiler can generate. */
+    public static enum SourceMap {
+        /** Generate no source map. */
+        NONE,
+        /** Generate a version 3 source map. */
+        V3
+    }
 
 }

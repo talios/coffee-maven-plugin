@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-/**
+/*
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:
@@ -28,19 +28,30 @@ import java.util.List;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- *
+ */
+
+/**
  * Run the Closure Compiler tool on a directory of Javascripts.
- *
+ * <p>
  * This class supports no configuration in its current form.
- *
  */
 public class ClosureMinifier {
 
+	/**
+	 * Creates a minifier using the default simple optimisations compilation level.
+	 *
+	 * @param logger the maven log to report compilation messages to
+	 */
 	public ClosureMinifier(Log logger){
 		this.logger = logger;
 	}
 
+	/**
+	 * Creates a minifier using the given compilation level.
+	 *
+	 * @param compilationLevel the name of the closure {@code CompilationLevel} to use
+	 * @param logger the maven log to report compilation messages to
+	 */
 	public ClosureMinifier(String compilationLevel, Log logger){
 		this.compilationLevel = compilationLevel;
 		this.logger = logger;
@@ -49,6 +60,12 @@ public class ClosureMinifier {
 	private Log logger;
 	private String compilationLevel = CompilationLevel.SIMPLE_OPTIMIZATIONS.toString();
 
+	/**
+	 * Minify the given javascript files into a single destination file.
+	 *
+	 * @param filesToCompile the javascript files to minify
+	 * @param destFileName the path of the minified file to write, replaced if it already exists
+	 */
 	public void compile(List<File> filesToCompile, String destFileName){
 		File destFile = prepareDestFile(destFileName);
 
@@ -131,10 +148,20 @@ public class ClosureMinifier {
 		return files;
 	}
 
+	/**
+	 * The compilation level applied when minifying.
+	 *
+	 * @return the name of the closure {@code CompilationLevel} in use
+	 */
 	public String getCompilationLevel() {
 		return compilationLevel;
 	}
 
+	/**
+	 * Sets the compilation level applied when minifying.
+	 *
+	 * @param compilationLevel the name of the closure {@code CompilationLevel} to use
+	 */
 	public void setCompilationLevel(String compilationLevel) {
 		this.compilationLevel = compilationLevel;
 	}

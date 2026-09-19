@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import org.apache.maven.model.FileSet;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/*
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:
@@ -29,12 +28,13 @@ import java.util.List;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- *
- * Wrap a Maven fileset to add properties for describing the group of files
- *
  */
+
+/** Wrap a Maven fileset to add properties for describing the group of files */
 public class JoinSet {
+    /** Creates an empty JoinSet, populated by maven from the plugin configuration. */
+    public JoinSet() {
+    }
 
     private String id;
 
@@ -63,33 +63,67 @@ public class JoinSet {
      */
     private String concatenatedStringOfFiles;
 
+    /**
+     * Whether each file in this JoinSet is compiled to its own javascript file.
+     *
+     * @return {@code true} to compile individually, {@code false} to concatenate, or {@code null} to inherit the
+     *         plugin wide setting
+     */
     public Boolean getCompileIndividualFiles() {
         return compileIndividualFiles;
     }
 
+    /**
+     * Sets whether each file in this JoinSet is compiled to its own javascript file.
+     *
+     * @param compileIndividualFiles {@code true} to compile individually, {@code false} to concatenate, or
+     *        {@code null} to inherit the plugin wide setting
+     */
     public void setCompileIndividualFiles(Boolean compileIndividualFiles) {
         this.compileIndividualFiles = compileIndividualFiles;
     }
 
+    /**
+     * The id grouping the files in this JoinSet.
+     *
+     * @return the id, which is also the name of the javascript file that is output
+     */
     public String getId() {
         return id;
     }
 
     /**
      * An id to group the Files in the Fileset.  This id becomes the name of the javascript file that is output.
+     *
+     * @param id the id of this JoinSet
      */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Whether the files in this JoinSet are literate CoffeeScript.
+     *
+     * @return {@code true} if the sources are literate CoffeeScript
+     */
     public boolean isLiterate() {
         return literate;
     }
 
+    /**
+     * Sets whether the files in this JoinSet are literate CoffeeScript.
+     *
+     * @param literate {@code true} if the sources are literate CoffeeScript
+     */
     public void setLiterate(boolean literate) {
         this.literate = literate;
     }
 
+    /**
+     * The directory the javascript for this JoinSet is written to.
+     *
+     * @return the output directory, or {@code null} to use the plugin wide output directory
+     */
     public File getCoffeeOutputDirectory() {
         return coffeeOutputDirectory;
     }
@@ -97,7 +131,7 @@ public class JoinSet {
     /**
      * A location where to put the output javascript(s) for this specific JoinSet.
      *
-     * @param coffeeOutputDirectory
+     * @param coffeeOutputDirectory the directory to write this JoinSet's javascript to
      */
     public void setCoffeeOutputDirectory(File coffeeOutputDirectory) {
         this.coffeeOutputDirectory = coffeeOutputDirectory;
@@ -105,7 +139,9 @@ public class JoinSet {
 
     /**
      * Pulls the list of files that will be used from the fileset.
-     * @throws MojoExecutionException
+     *
+     * @return the ordered files followed by the remaining files of the fileset
+     * @throws IOException if the files of the fileset cannot be read
      */
     public List<File> getFiles() throws IOException {
     	if(null==files){
@@ -121,6 +157,12 @@ public class JoinSet {
     	return files;
     }
 
+    /**
+     * The names of the files in this JoinSet, for logging.
+     *
+     * @return a comma separated list of file names
+     * @throws IOException if the files of the fileset cannot be read
+     */
     public String getFileNames() throws IOException {
     	StringBuilder joinSetFileNames = new StringBuilder();
 
@@ -132,6 +174,12 @@ public class JoinSet {
     	return joinSetFileNames.toString();
     }
 
+    /**
+     * The contents of every file in this JoinSet, joined in order.
+     *
+     * @return the concatenated contents of the files
+     * @throws IOException if a file is missing or cannot be read
+     */
     public String getConcatenatedStringOfFiles() throws IOException{
     	if(null==concatenatedStringOfFiles){
     		StringBuilder sb = new StringBuilder();
@@ -152,12 +200,19 @@ public class JoinSet {
     	return concatenatedStringOfFiles;
     }
 
+	/**
+	 * The maven FileSet defining what files are included, excluded, etc.
+	 *
+	 * @return the fileset, or {@code null} if only ordered files are used
+	 */
 	public FileSet getFileSet() {
 		return fileSet;
 	}
 
 	/**
 	 * a maven FileSet to define what files are included, excluded, etc
+	 *
+	 * @param fileSet the fileset selecting the files of this JoinSet
 	 */
 	public void setFileSet(FileSet fileSet) {
 		files = null;
@@ -166,10 +221,20 @@ public class JoinSet {
 
 	}
 
+    /**
+     * Files that are compiled ahead of, and in preference to, the files of the fileset.
+     *
+     * @return the explicitly ordered files
+     */
     public List<File> getOrderedFiles() {
         return orderedFiles;
     }
 
+    /**
+     * Files to compile ahead of, and in preference to, the files of the fileset.
+     *
+     * @param orderedFiles the files to compile first, in order
+     */
     public void setOrderedFiles(List<File> orderedFiles) {
         files = null;
         concatenatedStringOfFiles = null;

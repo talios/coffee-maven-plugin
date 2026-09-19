@@ -1,6 +1,6 @@
 package com.theoryinpractise.coffeescript;
 
-/**
+/*
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:
@@ -17,18 +17,27 @@ package com.theoryinpractise.coffeescript;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- *
- * Wrap Closure Compiler Errors
- *
  */
+
+/** Wrap Closure Compiler Errors */
 public class ClosureException extends RuntimeException {
 	private static final long serialVersionUID = 2449069058134279759L;
 
+	/**
+	 * Creates an exception describing a closure compiler failure.
+	 *
+	 * @param message the failure description
+	 */
 	public ClosureException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates an exception wrapping a closure compiler failure.
+	 *
+	 * @param message the failure description
+	 * @param t the underlying cause
+	 */
 	public ClosureException(String message, Throwable t) {
 		super(message, t);
 	}

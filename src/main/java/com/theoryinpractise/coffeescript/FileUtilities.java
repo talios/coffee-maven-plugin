@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-/**
+/*
  * Copyright 2011 Mark Derricutt.
  *
  * Contributing authors:
@@ -28,12 +28,21 @@ import java.util.List;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Utilities for working with Files and FileSets
- *
  */
+
+/** Utilities for working with Files and FileSets */
 public class FileUtilities {
 
+	private FileUtilities() {
+	}
+
+	/**
+	 * Resolve the files selected by a maven FileSet.
+	 *
+	 * @param fileSet the fileset to resolve
+	 * @return the files matching the fileset's includes and excludes
+	 * @throws IOException if the files cannot be accessed
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<File> getFilesFromFileSet(FileSet fileSet) throws IOException {
 		List<File> files = Lists.newArrayList();
@@ -52,6 +61,9 @@ public class FileUtilities {
 
     /**
      * Turn a list of Strings into a concatenated string of filenames
+     *
+     * @param list the strings to join
+     * @return the strings joined with commas
      */
     public static String getCommaSeparatedList(List<String> list) {
         StringBuffer sb = new StringBuffer();
@@ -68,6 +80,9 @@ public class FileUtilities {
 
     /**
      * Turn a list of files into a comma separated list of filenames
+     *
+     * @param fileList the files to join
+     * @return the absolute paths of the files, joined with commas
      */
     public static String getCommaSeparatedListOfFileNames(List<File> fileList){
     	StringBuffer sb = new StringBuffer();
@@ -84,7 +99,8 @@ public class FileUtilities {
 
 	/**
 	 * Convenience Method for turn a string path containing .js files into a list of files to be processed
-	 * @param sourceDirectory
+	 * @param sourceDirectory the directory to scan
+	 * @return the .js files directly within the directory, or an empty list if it does not exist
 	 */
 	public static List<File> directoryToFileList(String sourceDirectory){
 		List<File> files = Lists.newArrayList();
@@ -102,7 +118,8 @@ public class FileUtilities {
 
 	/**
 	 * Convenience Method for turning a string path for a single file into a list of files to be processed
-	 * @param sourceFile
+	 * @param sourceFile the path of the file
+	 * @return a single element list, or an empty list if the file does not exist
 	 */
 	public static List<File> fileToFileList(String sourceFile){
 		List<File> files = Lists.newArrayList();
@@ -117,6 +134,10 @@ public class FileUtilities {
 
 	/**
 	 * Convenience Method for turning a FileSet into a list of files to be processed
+	 *
+	 * @param fileset the fileset to resolve
+	 * @return the files matching the fileset
+	 * @throws IOException if the files cannot be accessed
 	 */
 	public static List<File> fileSetToFileList(FileSet fileset) throws IOException{
 		List<File> files = Lists.newArrayList();
