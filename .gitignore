@@ -2,3 +2,9 @@ target
 *.ipr
 *.iws
 *.iml
+dependency-reduced-pom.xml
+.idea
+.project
+.settings
+.flattened-pom.xml
+.inlined-pom.xml

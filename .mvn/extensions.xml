@@ -1,0 +1,8 @@
+<extensions>
+  <extension>
+    <groupId>eu.maveniverse.maven.nisse</groupId>
+    <artifactId>extension</artifactId>
+    <version>0.9.11</version>
+  </extension>
+</extensions>
+            
