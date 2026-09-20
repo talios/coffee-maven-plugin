@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.2.1</version>
+            <version>7.12.0</version>
         </dependency>
         <!-- the JDK no longer ships a JavaScript engine, so bring GraalJS along for the test -->
         <dependency>
