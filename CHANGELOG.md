@@ -1,4 +1,12 @@
-## [unreleased]
+## [2.0.2] - 2026-09-20
+
+### 🐛 Bug Fixes
+
+- Updated json, commons-io, and plexus-utils for security issues
+
+### 📚 Documentation
+
+- Updated CHANGELOG.md
 
 ### 💼 Other
 
